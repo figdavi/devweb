@@ -1,4 +1,4 @@
-# Desenvolvimento Web
+# Servixus
 
 Trabalho da Matéria de Desenvolvimento Web do período 2026.1
 
@@ -8,10 +8,15 @@ HTML, CSS, Bootstrap, MySQL, PHP e JavaScript.
 
 ## Todo
 
-- [ ] Definir escopo (RF e RN)
-- [ ] Escolher nome
-- [ ] Separar tarefas
-	- Acho interessante dividir por funcionalidade e não 1 pro backend e 1 pro front, por exemplo
-- [ ] Modelagem inicial do banco
+- [x] Definir escopo ([Requisitos Funcionais](RF.md), [Requisitos Não-Funcionais](RNF.md) e [Regras de Negócio](RN.md))
+- [x] Escolher nome
 
+- [ ] Modelagem inicial do banco
 - [ ] Definição das rotas de API
+
+## Apresentação
+
+- A proposta do sistema
+- As tecnologias utilizadas
+- As funcionalidades implementadas
+- O funcionamento do código
