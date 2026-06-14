@@ -1,0 +1,220 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  font-family: 'Ubuntu', sans-serif;
+  background-color: #6B6B6B;
+}
+
+header{
+    background-color: #1A1A2E;
+    margin: 0 auto;
+    padding:10px 20px;
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+}
+.logonome{
+    display:flex;
+    align-items: center;
+    gap: 15px;
+
+}
+
+.nome{
+    color: #F4F4F0;
+}
+
+.logo{
+    height: 50px;
+}
+
+.Registrar{
+    padding: 10px 24px;
+    background-color: #F4F4F0;
+    border: none;
+}
+
+.Entrar{
+    padding: 10px 24px;
+    background-color: #F5C518;
+    border: none;
+}
+
+.sobre {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+  padding: 60px 20px;
+  background-color: #fcfafa;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+}
+
+
+.texto1{
+  border-radius: 8px;
+  padding: 20px;
+  flex: 1; /* ocupa o espaço restante */
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.texto1 h1{
+    margin-bottom: 10px;
+}
+.sobre img {
+  width: 450px; /* largura da imagem */
+  border-radius: 8px;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 15%,
+    black 85%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 15%,
+    black 85%,
+    transparent 100%
+  );
+}
+
+.texto1::-webkit-scrollbar {
+  width: 6px;
+}
+
+.texto1::-webkit-scrollbar-track {
+  background: #F4F4F0;
+  border-radius: 4px;
+}
+
+.texto1::-webkit-scrollbar-thumb {
+  background: #F5C518;
+  border-radius: 4px;
+}
+
+.texto1::-webkit-scrollbar-thumb:hover {
+  background: #1A1A2E;
+}
+
+
+footer {
+  background-color: #1A1A2E;
+  color: #F4F4F0;
+  padding: 50px 20px 0px 20px;
+  margin-top: 60px;
+  font-family: 'Ubuntu', sans-serif;
+}
+
+.footer-container {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;             /* quebra linha em telas menores */
+  justify-content: space-between;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+  border-bottom: 1px solid #2D2D44;
+}
+
+.footer-marca {
+  flex: 2;
+  min-width: 200px;
+}
+
+.footer-marca img {
+  height: 45px;
+  margin-bottom: 10px;
+}
+
+.footer-marca h3 {
+  font-size: 1.2rem;
+  color: #F5C518;
+  margin-bottom: 8px;
+}
+
+.footer-marca p {
+  font-size: 0.9rem;
+  color: #6B6B6B;
+  line-height: 1.6;
+}
+
+.footer-links {
+  flex: 1;
+  min-width: 130px;
+}
+
+.footer-links h4 {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #F5C518;
+  margin-bottom: 14px;
+}
+
+.footer-links ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-links ul li a {
+  text-decoration: none;
+  color: #6B6B6B;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.footer-links ul li a:hover {
+  color: #F5C518;
+}
+
+.footer-bottom {
+  text-align: center;
+  padding: 16px 0;
+  font-size: 0.8rem;
+  color: #6B6B6B;
+}
+
+@media (max-width: 600px) {
+
+  header {
+    padding: 8px 12px;
+  }
+
+  .logo {
+    height: 35px;
+  }
+
+  .nome {
+    font-size: 1.1rem;
+  }
+
+  .Registrar,
+  .Entrar {
+    padding: 7px 12px;
+    font-size: 0.85rem;
+  }
+
+  .sobre {
+    flex-direction: row;  /* empilha texto e imagem */
+  }
+
+  .foto {
+    width: 100%;             /* imagem ocupa a largura toda */
+    max-width: 100%;
+  }
+
+  .texto1 {
+    max-height: 200px;       /* reduz a altura do scroll no mobile */
+  }
+}
