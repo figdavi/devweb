@@ -10,8 +10,10 @@ HTML, CSS, Bootstrap, MySQL, PHP e JavaScript.
 
 - [x] Definir escopo ([Requisitos Funcionais](RF.md), [Requisitos Não-Funcionais](RNF.md) e [Regras de Negócio](RN.md))
 - [x] Escolher nome
+- [x] Modelagem inicial do banco
+![MER](images/Servixus_MER-white.png)
 
-- [ ] Modelagem inicial do banco
+- [ ] Implementar modelo físico MySQL
 - [ ] Definição das rotas de API
 
 ## Apresentação
