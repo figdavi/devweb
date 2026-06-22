@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS agendamentos (
   data_hora_criacao DATETIME NOT NULL,
   data_hora_inicio DATETIME NOT NULL,
   data_hora_fim DATETIME NOT NULL,
-  status ENUM('pendente', 'orcamento enviado','confirmado', 'em andamento', 'concluido', 'cancelado') DEFAULT 'pendente',
+  status ENUM('aguardando_orcamento', 'orcamento_enviado', 'confirmado', 'em_andamento', 'concluido', 'cancelado') DEFAULT 'aguardando_orcamento',
   PRIMARY KEY (id_agendamento),
   FOREIGN KEY (id_cliente) REFERENCES clientes (id_cliente) ON DELETE CASCADE,
   FOREIGN KEY (id_prestador) REFERENCES prestadores (id_prestador) ON DELETE CASCADE,
