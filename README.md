@@ -13,7 +13,7 @@ HTML, CSS, Bootstrap, MySQL, PHP e JavaScript.
 - [x] Modelagem inicial do banco
 ![MER](docs/images/Servixus_MER-white.png)
 
-- [] Implementar modelo físico MySQL
+- [x] Implementar modelo físico MySQL
 - [ ] Definição das rotas de API
 
 ## Apresentação

@@ -1,0 +1,112 @@
+CREATE DATABASE IF NOT EXISTS servixus;
+
+USE servixus;
+
+CREATE TABLE IF NOT EXISTS usuarios (
+  id_usuario INT AUTO_INCREMENT,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  senha VARCHAR(255) NOT NULL,
+  nome VARCHAR(150) NOT NULL,
+  telefone VARCHAR(20) NOT NULL,
+  PRIMARY KEY (id_usuario)
+);
+
+CREATE TABLE IF NOT EXISTS categorias (
+  id_categoria INT AUTO_INCREMENT,
+  nome VARCHAR(100) UNIQUE NOT NULL,
+  PRIMARY KEY (id_categoria)
+);
+
+CREATE TABLE IF NOT EXISTS prestadores (
+  id_prestador INT AUTO_INCREMENT,
+  id_usuario INT UNIQUE NOT NULL,
+  id_categoria INT NOT NULL,
+  descricao_profissional TEXT,
+  cep VARCHAR(9) NOT NULL,
+  PRIMARY KEY (id_prestador),
+  FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario),
+  FOREIGN KEY (id_categoria) REFERENCES categorias (id_categoria)
+);
+
+CREATE TABLE IF NOT EXISTS clientes (
+  id_cliente INT AUTO_INCREMENT,
+  id_usuario INT UNIQUE NOT NULL,
+  PRIMARY KEY (id_cliente),
+  FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario)
+);
+
+CREATE TABLE IF NOT EXISTS locais (
+  id_local INT AUTO_INCREMENT,
+  id_cliente INT NOT NULL,
+  nome VARCHAR(100) NOT NULL,
+  cep VARCHAR(9) NOT NULL,
+  logradouro VARCHAR(255) NOT NULL,
+  numero VARCHAR(20) NOT NULL,
+  bairro VARCHAR(100) NOT NULL,
+  complemento VARCHAR(255),
+  cidade VARCHAR(100) NOT NULL,
+  estado VARCHAR(50) NOT NULL,
+  pais VARCHAR(50) NOT NULL,
+  PRIMARY KEY (id_local),
+  FOREIGN KEY (id_cliente) REFERENCES clientes (id_cliente) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS disponibilidade (
+  id_prestador INT NOT NULL,
+  dia_semana TINYINT NOT NULL,
+  hora_inicio TIME NOT NULL,
+  hora_fim TIME NOT NULL,
+  PRIMARY KEY (id_prestador, dia_semana),
+  FOREIGN KEY (id_prestador) REFERENCES prestadores (id_prestador) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS servicos (
+  id_servico INT AUTO_INCREMENT,
+  id_categoria INT NOT NULL,
+  titulo VARCHAR(150) NOT NULL,
+  descricao TEXT,
+  PRIMARY KEY (id_servico),
+  FOREIGN KEY (id_categoria) REFERENCES categorias (id_categoria)
+);
+
+CREATE TABLE IF NOT EXISTS prestador_servicos (
+  id_prestador INT NOT NULL,
+  id_servico INT NOT NULL,
+  tipo_cobranca ENUM('hora', 'diaria', 'servico') NOT NULL,
+  preco_base DECIMAL(10, 2) NOT NULL,
+  PRIMARY KEY (id_prestador, id_servico),
+  FOREIGN KEY (id_prestador) REFERENCES prestadores (id_prestador) ON DELETE CASCADE,
+  FOREIGN KEY (id_servico) REFERENCES servicos (id_servico) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS agendamentos (
+  id_agendamento INT AUTO_INCREMENT,
+  id_cliente INT NOT NULL,
+  id_prestador INT NOT NULL,
+  id_servico INT NOT NULL,
+  id_local INT NOT NULL,
+  descricao TEXT,
+  valor
+  data_hora_criacao DATETIME NOT NULL,
+  data_hora_inicio DATETIME NOT NULL,
+  data_hora_fim DATETIME NOT NULL,
+  status ENUM('pendente', 'orcamento enviado','confirmado', 'em andamento', 'concluido', 'cancelado') DEFAULT 'pendente',
+  PRIMARY KEY (id_agendamento),
+  FOREIGN KEY (id_cliente) REFERENCES clientes (id_cliente) ON DELETE CASCADE,
+  FOREIGN KEY (id_prestador) REFERENCES prestadores (id_prestador) ON DELETE CASCADE,
+  FOREIGN KEY (id_servico) REFERENCES servicos (id_servico) ON DELETE CASCADE,
+  FOREIGN KEY (id_local) REFERENCES locais (id_local) ON DELETE CASCADE
+);
+
+-- cliente_nota e prestador_nota podem ser NULL, visto que a avaliação é criada na hora da conclusão do agendamento, sendo necesário a espera que o cliente ou prestador avaliem (ou não).
+CREATE TABLE IF NOT EXISTS avaliacoes (
+  id_agendamento INT NOT NULL,
+  cliente_nota TINYINT CHECK (cliente_nota BETWEEN 1 AND 5),
+  cliente_comentario TEXT,
+  prestador_nota TINYINT CHECK (prestador_nota BETWEEN 1 AND 5),
+  prestador_comentario TEXT,
+  PRIMARY KEY (id_agendamento),
+  FOREIGN KEY (id_agendamento) REFERENCES agendamentos (id_agendamento) ON DELETE CASCADE
+);
+
+
