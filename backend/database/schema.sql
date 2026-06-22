@@ -86,7 +86,8 @@ CREATE TABLE IF NOT EXISTS agendamentos (
   id_servico INT NOT NULL,
   id_local INT NOT NULL,
   descricao TEXT,
-  valor
+  tipo_cobranca ENUM('hora', 'diaria', 'servico') NOT NULL,
+  valor DECIMAL(10, 2) NOT NULL,
   data_hora_criacao DATETIME NOT NULL,
   data_hora_inicio DATETIME NOT NULL,
   data_hora_fim DATETIME NOT NULL,
