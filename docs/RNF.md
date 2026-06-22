@@ -7,7 +7,7 @@
 | RNF03 | Sistema hospedado em serviço gratuito (InfinityFree ou X10Hosting) e acessível publicamente via URL. | Alta |
 | RNF04 | Interface responsiva, adaptada a mobile e desktop via grid do Bootstrap. | Média |
 | RNF05 | Estado de autenticação mantido entre páginas via sessões PHP. | Baixa |
-| RNF06 | CEP e coordenadas exatas dos Prestadores nunca expostos publicamente — apenas distância aproximada em raio. | Alta |
+| RNF06 | CEP e coordenadas exatas dos Prestadores nunca expostos publicamente, apenas distância aproximada em raio. | Alta |
 | RNF07 | Todas as entradas de usuário sanitizadas e validadas para prevenção de SQL Injection e XSS. | Média |
 | RNF08 | Banco de dados relacional normalizado (mín. 3FN), com chaves primárias, estrangeiras e índices nas colunas de busca. | Alta |
 | RNF09 | Páginas principais com tempo de carregamento de até 5 segundos na hospedagem gratuita. | Média |
