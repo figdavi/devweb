@@ -1,0 +1,13 @@
+html,body{
+    height:100%;
+}
+
+.form-container {
+    max-width: 300px;
+    padding: 1rem;
+}
+
+.form-container-registrar{
+    max-width: 500px;
+    padding: 1rem;
+}

@@ -8,39 +8,75 @@ body {
   background-color: #6B6B6B;
 }
 
-header{
+
+header {
     background-color: #1A1A2E;
     margin: 0 auto;
-    padding:10px 20px;
-    display:flex;
-    align-items:center;
-    justify-content: space-between;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
 }
-.logonome{
-    display:flex;
+
+
+.header-esquerda {
+    display: flex;
+    align-items: center;
+    gap: 35px; 
+}
+
+.logonome {
+    display: flex;
     align-items: center;
     gap: 15px;
-
 }
 
-.nome{
+.menu-navegacao {
+    display: flex;
+    gap: 20px; 
+}
+
+.menu-navegacao .info {
+    text-decoration: none;
+    color: #F4F4F0; 
+    font-weight: 400;
+    font-size: 1rem;
+    transition: color 0.2s ease;
+}
+
+
+.menu-navegacao .info:hover {
+    color: #F5C518; 
+}
+
+/* Nova classe para agrupar os botões */
+.header-botoes {
+    display: flex;
+    align-items: center;
+    gap: 12px; 
+}
+
+
+.nome {
     color: #F4F4F0;
 }
 
-.logo{
+.logo {
     height: 50px;
 }
 
-.Registrar{
+.Registrar {
     padding: 10px 24px;
     background-color: #F4F4F0;
     border: none;
+    cursor: pointer; 
 }
 
-.Entrar{
+.Entrar {
     padding: 10px 24px;
     background-color: #F5C518;
     border: none;
+    cursor: pointer; 
 }
 
 .sobre {
@@ -55,21 +91,21 @@ header{
   position: relative;
 }
 
-
-.texto1{
+.texto1 {
   border-radius: 8px;
   padding: 20px;
-  flex: 1; /* ocupa o espaço restante */
+  flex: 1; 
   max-height: 300px;
   overflow-y: auto;
   padding-right: 8px;
 }
 
-.texto1 h1{
+.texto1 h1 {
     margin-bottom: 10px;
 }
+
 .sobre img {
-  width: 450px; /* largura da imagem */
+  width: 450px; 
   border-radius: 8px;
   mask-image: linear-gradient(
     to right,
@@ -105,7 +141,6 @@ header{
   background: #1A1A2E;
 }
 
-
 footer {
   background-color: #1A1A2E;
   color: #F4F4F0;
@@ -117,7 +152,7 @@ footer {
 .footer-container {
   display: flex;
   gap: 40px;
-  flex-wrap: wrap;             /* quebra linha em telas menores */
+  flex-wrap: wrap;      
   justify-content: space-between;
   max-width: 1100px;
   margin: 0 auto;
@@ -186,9 +221,15 @@ footer {
 }
 
 @media (max-width: 600px) {
-
   header {
     padding: 8px 12px;
+    flex-direction: column; 
+    gap: 10px;
+  }
+
+  .header-esquerda {
+    flex-direction: column; 
+    gap: 8px;
   }
 
   .logo {
@@ -206,15 +247,15 @@ footer {
   }
 
   .sobre {
-    flex-direction: row;  /* empilha texto e imagem */
+    flex-direction: column; 
   }
 
-  .foto {
-    width: 100%;             /* imagem ocupa a largura toda */
+  .sobre img {
+    width: 100%;             
     max-width: 100%;
   }
 
   .texto1 {
-    max-height: 200px;       /* reduz a altura do scroll no mobile */
+    max-height: 200px;       
   }
 }
