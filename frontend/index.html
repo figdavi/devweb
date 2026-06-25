@@ -7,20 +7,28 @@
     <title>Servixus</title>
     <script defer src="script.js"></script>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+    
 </head>
 
 <body>
     <header>
+    <div class="header-esquerda">
         <div class="logonome">
-            <img class="logo" src="imagens/85b278c4-b9b3-4686-8e9d-728843eb81f9.png" alt="">
+            <img class="logo" src="imagens/85b278c4-b9b3-4686-8e9d-728843eb81f9.png" alt="Servixus Logo">
             <h1 class="nome">Servixus</h1>
         </div>
-        <nav>
-            <button class="Registrar">Registrar-se</button>
-            <button class="Entrar">Entrar</button>
+        
+        <nav class="menu-navegacao">
+            <a href="#home" class="info">Home</a>
+            <a href="#sobre" class="info">Sobre</a>
         </nav>
+    </div>
+
+    <div class="header-botoes">
+        <button onclick="window.location.href='login-form/Registrar.html' "class="Registrar">Registrar-se</button>
+        <button onclick="window.location.href='login-form/login.html' " class="Entrar">Entrar</button>
+    </div>
     </header>
     <section class="sobre">
         <div class="texto1">
