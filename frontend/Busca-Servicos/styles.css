@@ -1,0 +1,66 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  font-family: 'Ubuntu', sans-serif;
+  background-color: #ffffff;
+}
+
+
+header {
+    background-color: #1A1A2E;
+    margin: 0 auto;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+}
+
+
+.header-esquerda {
+    display: flex;
+    align-items: center;
+    gap: 35px; 
+}
+
+.logonome {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.menu-navegacao {
+    display: flex;
+    gap: 20px; 
+}
+
+.menu-navegacao .info {
+    text-decoration: none;
+    color: #F4F4F0; 
+    font-weight: 400;
+    font-size: 1rem;
+    transition: color 0.2s ease;
+}
+
+
+.menu-navegacao .info:hover {
+    color: #F5C518; 
+}
+
+/* Nova classe para agrupar os botões */
+.header-botoes {
+    display: flex;
+    align-items: center;
+    gap: 12px; 
+}
+
+
+.nome {
+    color: #F4F4F0;
+}
+
+.logo {
+    height: 50px;
+}
