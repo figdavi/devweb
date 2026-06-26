@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Selecione seu perfil</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container text-center py-5" style="max-width: 560px;">
+
+    <p class="text-uppercase text-muted fw-semibold" style="font-size: 12px; letter-spacing: .08em;">Bem-vindo</p>
+    <h1 class="fw-medium fs-3 mb-2">Como você quer usar a plataforma?</h1>
+    <p class="text-secondary mb-5">Escolha o perfil que melhor descreve você.</p>
+
+    <div class="row g-4 justify-content-center mb-4">
+
+      <div class="col-6 col-sm-5">
+        <div class="card card-option p-4 h-100" id="card-cliente" tabindex="0" role="button" aria-pressed="false"
+             onclick="selectType('cliente')" onkeydown="if(event.key==='Enter') selectType('cliente')">
+          <div class="d-flex justify-content-center mb-3">
+            <div class="icon-wrap" id="icon-cliente">
+              <i class="bi bi-house-door"></i>
+            </div>
+          </div>
+          <h2 class="fw-medium fs-6 mb-1">Cliente</h2>
+          <p class="text-muted mb-0" style="font-size: 13px;">Preciso de serviços para minha casa ou projeto</p>
+        </div>
+      </div>
+
+      <div class="col-6 col-sm-5">
+        <div class="card card-option p-4 h-100" id="card-prestador" tabindex="0" role="button" aria-pressed="false"
+             onclick="selectType('prestador')" onkeydown="if(event.key==='Enter') selectType('prestador')">
+          <div class="d-flex justify-content-center mb-3">
+            <div class="icon-wrap" id="icon-prestador">
+              <i class="bi bi-tools"></i>
+            </div>
+          </div>
+          <h2 class="fw-medium fs-6 mb-1">Prestador de serviço</h2>
+          <p class="text-muted mb-0" style="font-size: 13px;">Ofereço serviços e quero encontrar clientes</p>
+        </div>
+      </div>
+
+    </div>
+
+    <button class="btn btn-primary px-5 py-2 invisible" id="btn-continue" onclick="continuar()">
+      Continuar <i class="bi bi-arrow-right ms-1"></i>
+    </button>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
