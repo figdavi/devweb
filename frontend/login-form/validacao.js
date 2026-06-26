@@ -1,7 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
     // 1. Captura os elementos usando os IDs corretos do seu HTML (# significa ID)
     const formLogin = document.getElementById("formLogin");
-    const formRegistrar = document.getElementById("formRegistrar");
+    const formRegistrarCliente = document.getElementById("formRegistrarCliente");
+    const formRegistrarPrestador = document.getElementById("formRegistrarPrestador");
     const containerAlerta = document.getElementById("containerAlerta");
 
     // Função para renderizar o alerta do Bootstrap dentro da div #containerAlerta
@@ -16,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // ================= VALIDAÇÃO LOGIN =================
+    // Validar Login
     if (formLogin) {
         formLogin.addEventListener("submit", function (evento) {
             // Busca as classes específicas que você colocou nos inputs (. significa classe)
@@ -30,22 +31,40 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ================= VALIDAÇÃO REGISTRAR =================
-    if (formRegistrar) {
-        formRegistrar.addEventListener("submit", function (evento) {
+    // Cadastrar Cliente 
+    if (formRegistrarCliente) {
+        formRegistrarCliente.addEventListener("submit", function (evento) {
             // Busca as classes específicas que você colocou nos inputs do registro
-            const nome = formRegistrar.querySelector(".reg-nome").value.trim();
-            const email = formRegistrar.querySelector(".reg-email").value.trim();
-            const senha = formRegistrar.querySelector(".reg-senha").value.trim();
-            const confirmarSenha = formRegistrar.querySelector(".reg-confirmar-senha").value.trim();
+            const nome = formRegistrarCliente.querySelector(".reg-nome").value.trim();
+            const email = formRegistrarCliente.querySelector(".reg-email").value.trim();
+            const senha = formRegistrarCliente.querySelector(".reg-senha").value.trim();
+            const confirmarSenha = formRegistrarCliente.querySelector(".reg-confirmar-senha").value.trim();
+            const cep = formRegistrarCliente.querySelector(".reg-cep").value.trim();
             
             // Como seu checkbox usa o ID padrão do Bootstrap, capturamos por ele aqui
             const termosCheck = document.getElementById("flexCheckDefault") ? document.getElementById("flexCheckDefault").checked : false;
 
-            if (nome === "" || email === "" || senha === "" || confirmarSenha === "" || !termosCheck) {
+            if (nome === "" || email === "" || senha === "" || confirmarSenha === "" || cep === "" || !termosCheck) {
                 evento.preventDefault(); // Impede o envio do formulário
                 mostrarAlerta();
             }
+        });
+    }
+
+    if(formRegistrarPrestador) {
+        formRegistrarPrestador.addEventListener("submit", function (evento){
+            const nome = formRegistrarPrestador.querySelector(".reg-nome").value.trim();
+            const email = formRegistrarPrestador.querySelector(".reg-email").value.trim();
+            const senha = formRegistrarPrestador.querySelector(".reg-senha").value.trim();
+            const confirmarSenha = formRegistrarPrestador.querySelector(".reg-confirmar-senha").value.trim();
+            const cep = formRegistrarPrestador.querySelector(".reg-cep").value.trim();
+            const opcaoSelecionada = formRegistrarPrestador.querySelector(".reg-opcao").value;
+            const descricao = formRegistrarPrestador.querySelector(".reg-descricao").value.trim();
+            const termosCheck = document.getElementById("flexCheckDefault") ? document.getElementById("flexCheckDefault").checked : false;
+            if (nome === "" || email === "" || senha === "" || confirmarSenha === "" || cep === "" || opcaoSelecionada === "" || descricao === "" || !termosCheck) {
+                    evento.preventDefault(); // Impede o envio do formulário
+                    mostrarAlerta();
+                }
         });
     }
 });

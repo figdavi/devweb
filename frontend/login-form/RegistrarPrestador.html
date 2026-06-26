@@ -9,9 +9,12 @@
 </head>
   <body class="d-flex align-items-center py-4 Bg-body-tertiary">
     <main class="w-100 m-auto form-container-registrar">
-        <form id="formRegistrar">
+        <form id="formRegistrarPrestador">
             <div id="containerAlerta"></div>
-            <img src="../imagens/85b278c4-b9b3-4686-8e9d-728843eb81f9.png" class="mb-4" height="70" />
+            <a href="../index.html" class="d-flex align-items-center text-decoration-none">
+                <img src="../imagens/85b278c4-b9b3-4686-8e9d-728843eb81f9.png" class="me-3" height="70" />
+                <h1 class="nome m-0">Servixus</h1>
+            </a>
             <h1 class="h3 mb-3 fw-normal">Registrar Prestador</h1>
             <div class="form-floating">
                 <input type="text" class="form-control mb-3 reg-nome" id="floating-input" placeholder="Seu nome">
@@ -26,10 +29,31 @@
                 <label for="floating-input">Senha</label>
             </div>
             <div class="form-floating">
-                <input type="password" class="form-control reg-confirmar-senha" id="floating-input" placeholder="Senha">
+                <input type="password" class="form-control mb-3 reg-confirmar-senha" id="floating-input" placeholder="Senha">
                 <label for="floating-input">Confirmar Senha</label>
             </div>
-            <div class="form-check text-start my-3">
+            <div class="form-floating">
+                <input type="text" class="form-control mb-3 reg-cep" id="floating-input" placeholder="CEP" inputmode="numeric" maxlength="8"
+                    pattern="\d{8}" oninput="this.value = this.value.replace(/\D/g, '')">
+                <label for="floating-input">Seu CEP (Apenas Números)</label>
+            </div>
+            <div class="form-floating mb-3">
+                <select class="form-select reg-opcao" id="floatingSelect" aria-label="Escolha uma opção">
+                    <option selected disabled value="">Selecione uma opção...</option>
+                    <option value="1">Pedreiro</option>
+                    <option value="2">Eletricista</option>
+                    <option value="3">Pintor</option>
+                    <option value="4">Marceneiro</option>
+                    <option value="5">Limpeza</option>
+                </select>
+                <label for="floatingSelect">Escolha o Tipo de Serviço</label>
+            </div>
+            <div class="form-floating">
+                <textarea class="form-control reg-descricao" id="floatingTextarea" placeholder="Digite aqui"
+                    style="height: 100px;"></textarea>
+                <label for="floatingTextarea">Descrição Profissional</label>
+            </div>
+            <div class="form-check text-start my-3 reg-termo">
                 <input type="checkbox" class="form-check-input" id="flexCheckDefault">
                 <label class="form-check-label" for="flexCheckDefault">Concordo com os <a href="#!">Termos de Serviço</a></label>                    
             </div>
