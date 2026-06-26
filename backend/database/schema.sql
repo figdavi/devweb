@@ -18,20 +18,22 @@ CREATE TABLE IF NOT EXISTS categorias (
 );
 
 CREATE TABLE IF NOT EXISTS prestadores (
-  id_prestador INT AUTO_INCREMENT,
-  id_usuario INT UNIQUE NOT NULL,
+  id_usuario INT,
   id_categoria INT NOT NULL,
   descricao_profissional TEXT,
   cep VARCHAR(9) NOT NULL,
-  PRIMARY KEY (id_prestador),
+  logradouro VARCHAR(255) NOT NULL,
+  bairro VARCHAR(100) NOT NULL,
+  cidade VARCHAR(100) NOT NULL,
+  estado VARCHAR(50) NOT NULL,
+  PRIMARY KEY (id_usuario),
   FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario),
   FOREIGN KEY (id_categoria) REFERENCES categorias (id_categoria)
 );
 
 CREATE TABLE IF NOT EXISTS clientes (
-  id_cliente INT AUTO_INCREMENT,
-  id_usuario INT UNIQUE NOT NULL,
-  PRIMARY KEY (id_cliente),
+  id_usuario INT,
+  PRIMARY KEY (id_usuario),
   FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario)
 );
 
@@ -46,9 +48,8 @@ CREATE TABLE IF NOT EXISTS locais (
   complemento VARCHAR(255),
   cidade VARCHAR(100) NOT NULL,
   estado VARCHAR(50) NOT NULL,
-  pais VARCHAR(50) NOT NULL,
   PRIMARY KEY (id_local),
-  FOREIGN KEY (id_cliente) REFERENCES clientes (id_cliente) ON DELETE CASCADE
+  FOREIGN KEY (id_cliente) REFERENCES clientes (id_usuario) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS disponibilidade (
@@ -57,13 +58,13 @@ CREATE TABLE IF NOT EXISTS disponibilidade (
   hora_inicio TIME NOT NULL,
   hora_fim TIME NOT NULL,
   PRIMARY KEY (id_prestador, dia_semana),
-  FOREIGN KEY (id_prestador) REFERENCES prestadores (id_prestador) ON DELETE CASCADE
+  FOREIGN KEY (id_prestador) REFERENCES prestadores (id_usuario) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS servicos (
   id_servico INT AUTO_INCREMENT,
-  id_categoria INT NOT NULL,
-  titulo VARCHAR(150) NOT NULL,
+  id_categoria INT NOT NULL UNIQUE,
+  titulo VARCHAR(150) NOT NULL UNIQUE,
   descricao TEXT,
   PRIMARY KEY (id_servico),
   FOREIGN KEY (id_categoria) REFERENCES categorias (id_categoria)
@@ -75,7 +76,7 @@ CREATE TABLE IF NOT EXISTS prestador_servicos (
   tipo_cobranca ENUM('hora', 'diaria', 'servico') NOT NULL,
   preco_base DECIMAL(10, 2) NOT NULL,
   PRIMARY KEY (id_prestador, id_servico),
-  FOREIGN KEY (id_prestador) REFERENCES prestadores (id_prestador) ON DELETE CASCADE,
+  FOREIGN KEY (id_prestador) REFERENCES prestadores (id_usuario) ON DELETE CASCADE,
   FOREIGN KEY (id_servico) REFERENCES servicos (id_servico) ON DELETE CASCADE
 );
 
@@ -91,10 +92,12 @@ CREATE TABLE IF NOT EXISTS agendamentos (
   data_hora_criacao DATETIME NOT NULL,
   data_hora_inicio DATETIME NOT NULL,
   data_hora_fim DATETIME NOT NULL,
+  cliente_confirmou BOOLEAN DEFAULT FALSE,
+  prestador_confirmou BOOLEAN DEFAULT FALSE,
   status ENUM('aguardando_orcamento', 'orcamento_enviado', 'confirmado', 'em_andamento', 'concluido', 'cancelado') DEFAULT 'aguardando_orcamento',
   PRIMARY KEY (id_agendamento),
-  FOREIGN KEY (id_cliente) REFERENCES clientes (id_cliente) ON DELETE CASCADE,
-  FOREIGN KEY (id_prestador) REFERENCES prestadores (id_prestador) ON DELETE CASCADE,
+  FOREIGN KEY (id_cliente) REFERENCES clientes (id_usuario) ON DELETE CASCADE,
+  FOREIGN KEY (id_prestador) REFERENCES prestadores (id_usuario) ON DELETE CASCADE,
   FOREIGN KEY (id_servico) REFERENCES servicos (id_servico) ON DELETE CASCADE,
   FOREIGN KEY (id_local) REFERENCES locais (id_local) ON DELETE CASCADE
 );
