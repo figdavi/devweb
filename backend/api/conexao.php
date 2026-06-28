@@ -2,7 +2,7 @@
 
 $host   = "localhost";
 $user   = "root";
-$pass   = "devweb123";
+$pass   = "";
 $dbname = "servixus";
 
 $con = mysqli_connect($host, $user, $pass, $dbname);

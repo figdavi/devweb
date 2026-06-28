@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==========================================
     if (formLogin) {
         formLogin.addEventListener("submit", async function (evento) {
-            evento.preventDefault(); // Impede a página de recarregar
+            evento.preventDefault();
 
             const email = formLogin.querySelector(".login-email").value.trim();
             const senha = formLogin.querySelector(".login-senha").value.trim();
@@ -47,25 +47,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (dados.sucesso) {
                     mostrarAlerta(`Bem-vindo(a), ${dados.nome}!`, "success");
 
-                    // Salva os dados no navegador para o usuário continuar logado
                     localStorage.setItem('id_usuario', dados.id_usuario);
                     localStorage.setItem('nome_usuario', dados.nome);
                     localStorage.setItem('tipo_usuario', dados.tipo);
 
-                    // Aguarda 1.5 segundos para a pessoa ler o alerta e redireciona
                     setTimeout(() => {
                         if (dados.tipo === 'cliente') {
-
-                            // É ESTA LINHA QUE MANDA O CLIENTE PARA A PÁGINA DE BUSCA
                             window.location.href = '../Busca-Servicos/servicos.html';
-
                         } else if (dados.tipo === 'prestador') {
-                            window.location.href = '../Agenda - Prestador/index.html';
+                            window.location.href = '../Agenda - Prestador/agenda.html';
                         } else {
                             window.location.href = '../index.html';
                         }
-                    }, 1500); // 1500 milissegundos = 1,5 segundos de espera
-
+                    }, 1500);
                 } else {
                     mostrarAlerta(dados.erro, "danger");
                 }

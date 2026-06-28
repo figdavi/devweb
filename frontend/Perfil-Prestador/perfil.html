@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Perfil Prestador – Servixus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="../Busca-Servicos/styles.css">
+  </head>
+  <body>
+    <header>
+      <div class="header-esquerda">
+        <div class="logonome">
+          <img class="logo" src="../imagens/85b278c4-b9b3-4686-8e9d-728843eb81f9.png" alt="Servixus Logo">
+          <h1 class="nome">Servixus</h1>
+        </div>
+        <nav class="menu-navegacao">
+          <a href="../Agenda - Prestador/agenda.html" class="info">Minha Agenda</a>
+          <a href="#" class="info">Meu Perfil</a>
+        </nav>
+      </div>
+      <div class="header-botoes">
+        <button class="btn btn-outline-light btn-sm" id="btnSair">Sair</button>
+      </div>
+    </header>
+
+    <main class="container my-5 d-flex justify-content-center">
+      <div style="max-width: 640px; width: 100%;">
+
+        <h2 class="mb-4">Meu Perfil</h2>
+        <div id="containerAlerta"></div>
+
+        <!-- Informações pessoais -->
+        <div class="card p-4 shadow mb-4">
+          <h5 class="mb-3">Informações pessoais</h5>
+          <form id="formPerfil">
+            <div class="form-floating mb-3">
+              <input type="email" class="form-control" id="inputEmail" placeholder="email" disabled>
+              <label for="inputEmail">E-mail</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="inputNome" placeholder="Nome">
+              <label for="inputNome">Nome</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="tel" class="form-control" id="inputTelefone" placeholder="Telefone">
+              <label for="inputTelefone">Telefone</label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Salvar alterações</button>
+          </form>
+        </div>
+
+        <!-- Informações profissionais -->
+        <div class="card p-4 shadow mb-4">
+          <h5 class="mb-3">Informações profissionais</h5>
+          <div id="containerAlertaProfissional"></div>
+          <form id="formProfissional">
+            <div class="form-floating mb-3">
+              <select class="form-select" id="inputCategoria">
+                <option value="" disabled selected>Carregando...</option>
+              </select>
+              <label for="inputCategoria">Categoria</label>
+            </div>
+            <div class="form-floating mb-3">
+              <textarea class="form-control" id="inputDescricao" placeholder="Descrição" style="height: 100px"></textarea>
+              <label for="inputDescricao">Descrição profissional</label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Salvar alterações</button>
+          </form>
+        </div>
+
+        <!-- Endereço de atuação -->
+        <div class="card p-4 shadow mb-4">
+          <h5 class="mb-3">Endereço de atuação</h5>
+          <div id="containerAlertaEndereco"></div>
+          <form id="formEndereco">
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="inputCep" placeholder="CEP" maxlength="9">
+              <label for="inputCep">CEP</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="inputLogradouro" placeholder="Logradouro" readonly>
+              <label for="inputLogradouro">Logradouro</label>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-8">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="inputCidade" placeholder="Cidade" readonly>
+                  <label for="inputCidade">Cidade</label>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="inputEstado" placeholder="Estado" readonly>
+                  <label for="inputEstado">Estado</label>
+                </div>
+              </div>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="inputBairro" placeholder="Bairro" readonly>
+              <label for="inputBairro">Bairro</label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Salvar endereço</button>
+          </form>
+        </div>
+
+        <!-- Alterar senha -->
+        <div class="card p-4 shadow mb-4">
+          <h5 class="mb-3">Alterar senha</h5>
+          <div id="containerAlertaSenha"></div>
+          <form id="formSenha">
+            <div class="form-floating mb-3">
+              <input type="password" class="form-control" id="inputSenhaNova" placeholder="Nova senha">
+              <label for="inputSenhaNova">Nova senha</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="password" class="form-control" id="inputSenhaConfirmar" placeholder="Confirmar nova senha">
+              <label for="inputSenhaConfirmar">Confirmar nova senha</label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Alterar senha</button>
+          </form>
+        </div>
+
+        <!-- Zona de perigo -->
+        <div class="card p-4 shadow border-danger mb-4">
+          <h5 class="mb-1 text-danger">Zona de perigo</h5>
+          <p class="text-secondary small mb-3">Esta ação é irreversível. Todos os seus dados serão removidos permanentemente.</p>
+          <button class="btn btn-outline-danger btn-sm" id="btnExcluirConta">Excluir minha conta</button>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Modal: Confirmar exclusão de conta -->
+    <div class="modal fade" id="modalExcluir" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title text-danger">Excluir conta</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            Tem certeza que deseja excluir sua conta? Todos os seus dados serão removidos e não poderão ser recuperados.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-danger" id="btnConfirmarExclusao">Sim, excluir</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script src="../sessao.js"></script>
+    <script src="perfil.js"></script>
+  </body>
+</html>
