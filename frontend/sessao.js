@@ -30,4 +30,25 @@ document.addEventListener("DOMContentLoaded", function () {
     if (elementoNome) {
         elementoNome.innerText = `Olá, ${nomeUsuario}`;
     }
+
+    // ==========================================
+    // RENDERIZAR MENU DINÂMICO
+    // ==========================================
+    const menuDinamico = document.getElementById("menuDinamico");
+
+    if (menuDinamico) {
+        if (tipoUsuario === 'cliente') {
+            menuDinamico.innerHTML = `
+                <a href="../Agendamentos-Cliente/index.html" class="info">Meus Agendamentos</a>
+                <a href="../Perfil-Cliente/index.html" class="info">Perfil</a>
+                <a href="../Busca-Servicos/servicos.html" class="info">Buscar Serviços</a>
+            `;
+        } else if (tipoUsuario === 'prestador') {
+            menuDinamico.innerHTML = `
+                <a href="../Agenda - Prestador/index.html" class="info">Meus Agendamentos</a>
+                <a href="../Perfil - Prestador/index.html" class="info">Perfil</a>
+                <a href="../Agenda - Prestador/index.html" class="info">Agenda</a>
+            `;
+        }
+    }
 });
