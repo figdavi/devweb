@@ -1,13 +1,16 @@
 <!doctype html>
 <html lang="pt-br" data-bs-theme="dark">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bootstrap demo</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="loginstyles.css">
 </head>
-  <body class="d-flex align-items-center py-4 Bg-body-tertiary">
+
+<body class="d-flex align-items-center py-4 Bg-body-tertiary">
     <main class="w-100 m-auto form-container-registrar">
         <form id="formRegistrarCliente">
             <div id="containerAlerta"></div>
@@ -21,7 +24,8 @@
                 <label for="floating-input">Nome</label>
             </div>
             <div class="form-floating">
-                <input type="email" class="form-control mb-3 reg-email" id="floating-input" placeholder="Seu-email@gmail.com">
+                <input type="email" class="form-control mb-3 reg-email" id="floating-input"
+                    placeholder="Seu-email@gmail.com">
                 <label for="floating-input">E-mail</label>
             </div>
             <div class="form-floating">
@@ -29,27 +33,38 @@
                 <label for="floating-input">Senha</label>
             </div>
             <div class="form-floating">
-                <input type="password" class="form-control mb-3 reg-confirmar-senha" id="floating-input" placeholder="Senha">
+                <input type="password" class="form-control mb-3 reg-confirmar-senha" id="floating-input"
+                    placeholder="Senha">
                 <label for="floating-input">Confirmar Senha</label>
             </div>
             <div class="form-floating">
-                <input type="text" class="form-control reg-cep" id="floating-input" placeholder="CEP" inputmode="numeric" maxlength="8"
-                    pattern="\d{8}" oninput="this.value = this.value.replace(/\D/g, '')">
+                <input type="text" class="form-control mb-3 reg-cep" id="floating-input" placeholder="CEP"
+                    inputmode="numeric" maxlength="8" pattern="\d{8}"
+                    oninput="this.value = this.value.replace(/\D/g, '')">
                 <label for="floating-input">Seu CEP (Apenas Números)</label>
+            </div>
+            <div class="form-floating">
+                <input type="tel" class="form-control mb-3 reg-telefone" id="floating-telefone"
+                    placeholder="(00) 00000-0000">
+                <label for="floating-telefone">Telefone</label>
             </div>
             <div class="form-check text-start my-3">
                 <input type="checkbox" class="form-check-input" id="flexCheckDefault">
-                <label class="form-check-label" for="flexCheckDefault">Concordo com os <a href="#!">Termos de Serviço</a></label>                    
+                <label class="form-check-label" for="flexCheckDefault">Concordo com os <a href="#!">Termos de
+                        Serviço</a></label>
             </div>
 
-            
+
             <a href="login.html" class="mb-4">Já possui uma conta?</a>
             <button class="btn btn-primary w-100 py-2 my-3">Registrar</button>
             <p class="text-body-secondary mt-5 mb-3">© 2026 Servixus</p>
         </form>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
     <script src="validacao.js"></script>
 </body>
+
 </html>
