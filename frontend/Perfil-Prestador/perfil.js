@@ -10,10 +10,14 @@ document.addEventListener("DOMContentLoaded", async function () {
         `;
     }
 
-    const containerAlerta          = document.getElementById("containerAlerta");
+    const containerAlerta             = document.getElementById("containerAlerta");
     const containerAlertaProfissional = document.getElementById("containerAlertaProfissional");
-    const containerAlertaEndereco  = document.getElementById("containerAlertaEndereco");
-    const containerAlertaSenha     = document.getElementById("containerAlertaSenha");
+    const containerAlertaEndereco     = document.getElementById("containerAlertaEndereco");
+    const containerAlertaSenha        = document.getElementById("containerAlertaSenha");
+    const containerAlertaServicos     = document.getElementById("containerAlertaServicos");
+    const containerAlertaModalServico = document.getElementById("containerAlertaModalServico");
+
+    let idCategoriaPrestador = null;
 
     // ── Carregar dados ─────────────────────────────────────────────────────
     const [respUser, respPrestador, respCategorias] = await Promise.all([
@@ -47,6 +51,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     try {
         const prestador = await respPrestador.json();
+        idCategoriaPrestador = prestador.id_categoria;
         document.getElementById("inputCategoria").value  = prestador.id_categoria;
         document.getElementById("inputDescricao").value  = prestador.descricao_profissional ?? "";
         document.getElementById("inputCep").value        = prestador.cep;
@@ -54,6 +59,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         document.getElementById("inputBairro").value     = prestador.bairro;
         document.getElementById("inputCidade").value     = prestador.cidade;
         document.getElementById("inputEstado").value     = prestador.estado;
+        carregarServicos();
     } catch {
         mostrarAlerta(containerAlertaProfissional, "Erro ao carregar dados profissionais.", "danger");
     }
@@ -204,6 +210,115 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
         } catch {
             mostrarAlerta(containerAlertaSenha, "Erro ao conectar com o servidor.", "danger");
+        }
+    });
+
+    // ── Serviços ───────────────────────────────────────────────────────────
+
+    async function carregarServicos() {
+        try {
+            const resp  = await fetch(`../../backend/api/me/servicos/list.php?id_usuario=${id_usuario}`);
+            const dados = await resp.json();
+            const lista = document.getElementById("listaServicos");
+
+            if (dados.erro || !Array.isArray(dados) || dados.length === 0) {
+                lista.innerHTML = '<p class="text-secondary small mb-0">Nenhum serviço cadastrado.</p>';
+                return;
+            }
+
+            const labels = { hora: "Por hora", diaria: "Por diária", servico: "Por serviço" };
+
+            lista.innerHTML = dados.map(s => `
+                <div class="d-flex justify-content-between align-items-start border rounded p-3 mb-2">
+                    <div>
+                        <strong>${s.titulo}</strong>
+                        <div class="text-secondary small">
+                            ${labels[s.tipo_cobranca] ?? s.tipo_cobranca} · R$ ${parseFloat(s.preco_base).toFixed(2).replace(".", ",")}
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-danger btn-sm ms-3 flex-shrink-0"
+                            data-id="${s.id_servico}">Remover</button>
+                </div>
+            `).join("");
+
+            lista.querySelectorAll("[data-id]").forEach(btn => {
+                btn.addEventListener("click", () => removerServico(btn.dataset.id));
+            });
+        } catch {
+            mostrarAlerta(containerAlertaServicos, "Erro ao carregar serviços.", "danger");
+        }
+    }
+
+    async function removerServico(id_servico) {
+        const formData = new FormData();
+        formData.append("id_usuario", id_usuario);
+        formData.append("id_servico", id_servico);
+
+        try {
+            const resp  = await fetch("../../backend/api/me/servicos/delete.php", { method: "POST", body: formData });
+            const dados = await resp.json();
+            if (dados.sucesso) {
+                carregarServicos();
+            } else {
+                mostrarAlerta(containerAlertaServicos, dados.erro, "danger");
+            }
+        } catch {
+            mostrarAlerta(containerAlertaServicos, "Erro ao conectar com o servidor.", "danger");
+        }
+    }
+
+    // Preencher modal com serviços da categoria ao abrir
+    document.getElementById("modalAdicionarServico").addEventListener("show.bs.modal", async function () {
+        const select = document.getElementById("servicoSelect");
+        select.innerHTML = '<option value="" disabled selected>Carregando...</option>';
+        containerAlertaModalServico.innerHTML = "";
+
+        try {
+            const resp  = await fetch(`../../backend/api/catalogo/categorias_servicos.php?id_categoria=${idCategoriaPrestador}`);
+            const dados = await resp.json();
+
+            if (dados.erro || !Array.isArray(dados)) {
+                select.innerHTML = '<option value="" disabled selected>Nenhum serviço disponível</option>';
+                return;
+            }
+
+            select.innerHTML = '<option value="" disabled selected>Selecione um serviço</option>' +
+                dados.map(s => `<option value="${s.id_servico}">${s.titulo}</option>`).join("");
+        } catch {
+            mostrarAlerta(containerAlertaModalServico, "Erro ao carregar serviços.", "danger");
+        }
+    });
+
+    document.getElementById("btnSalvarServico").addEventListener("click", async function () {
+        const id_servico    = document.getElementById("servicoSelect").value;
+        const tipo_cobranca = document.getElementById("servicoTipoCobranca").value;
+        const preco_base    = document.getElementById("servicoPreco").value;
+
+        if (!id_servico || !preco_base) {
+            mostrarAlerta(containerAlertaModalServico, "Selecione um serviço e informe o preço.", "warning");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("id_usuario",    id_usuario);
+        formData.append("id_servico",    id_servico);
+        formData.append("tipo_cobranca", tipo_cobranca);
+        formData.append("preco_base",    preco_base);
+
+        try {
+            const resp  = await fetch("../../backend/api/me/servicos/create.php", { method: "POST", body: formData });
+            const dados = await resp.json();
+
+            if (dados.sucesso) {
+                bootstrap.Modal.getInstance(document.getElementById("modalAdicionarServico")).hide();
+                document.getElementById("formAdicionarServico").reset();
+                containerAlertaModalServico.innerHTML = "";
+                carregarServicos();
+            } else {
+                mostrarAlerta(containerAlertaModalServico, dados.erro, "danger");
+            }
+        } catch {
+            mostrarAlerta(containerAlertaModalServico, "Erro ao conectar com o servidor.", "danger");
         }
     });
 
