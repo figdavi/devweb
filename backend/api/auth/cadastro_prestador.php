@@ -2,6 +2,7 @@
 
 header('Content-Type: application/json');
 require_once '../conexao.php';
+require_once '../viacep.php';
 
 $email                  = $_POST['email'] ?? '';
 $senha                  = password_hash($_POST['senha'] ?? '', PASSWORD_BCRYPT);
@@ -10,10 +11,17 @@ $telefone               = $_POST['telefone'] ?? '';
 $id_categoria           = $_POST['id_categoria'] ?? null;
 $descricao_profissional = $_POST['descricao_profissional'] ?? null;
 $cep                    = $_POST['cep'] ?? '';
-$logradouro             = $_POST['logradouro'] ?? '';
-$bairro                 = $_POST['bairro'] ?? '';
-$cidade                 = $_POST['cidade'] ?? '';
-$estado                 = $_POST['estado'] ?? '';
+
+$endereco = buscar_cep($cep);
+if ($endereco === null) {
+    echo json_encode(["sucesso" => false, "erro" => "CEP inválido ou não encontrado."]);
+    exit;
+}
+
+$logradouro = $endereco['logradouro'];
+$bairro     = $endereco['bairro'];
+$cidade     = $endereco['localidade'];
+$estado     = $endereco['uf'];
 
 $con->begin_transaction();
 

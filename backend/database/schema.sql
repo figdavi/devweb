@@ -2,6 +2,18 @@ CREATE DATABASE IF NOT EXISTS servixus;
 
 USE servixus;
 
+-- Drop na ordem inversa das FKs para evitar constraint errors
+DROP TABLE IF EXISTS avaliacoes;
+DROP TABLE IF EXISTS agendamentos;
+DROP TABLE IF EXISTS disponibilidade;
+DROP TABLE IF EXISTS prestador_servicos;
+DROP TABLE IF EXISTS locais;
+DROP TABLE IF EXISTS servicos;
+DROP TABLE IF EXISTS prestadores;
+DROP TABLE IF EXISTS clientes;
+DROP TABLE IF EXISTS usuarios;
+DROP TABLE IF EXISTS categorias;
+
 CREATE TABLE IF NOT EXISTS usuarios (
   id_usuario INT AUTO_INCREMENT,
   email VARCHAR(255) UNIQUE NOT NULL,
