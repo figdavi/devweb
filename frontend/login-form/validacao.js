@@ -18,16 +18,60 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // ==========================================
-    // VALIDAR LOGIN (Apenas Front-end por enquanto)
+    // VALIDAR LOGIN (Integrado com Back-end)
     // ==========================================
     if (formLogin) {
-        formLogin.addEventListener("submit", function (evento) {
+        formLogin.addEventListener("submit", async function (evento) {
+            evento.preventDefault(); // Impede a página de recarregar
+
             const email = formLogin.querySelector(".login-email").value.trim();
             const senha = formLogin.querySelector(".login-senha").value.trim();
 
             if (email === "" || senha === "") {
-                evento.preventDefault();
                 mostrarAlerta("Preencha todos os campos.", "warning");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('senha', senha);
+
+            try {
+                const resposta = await fetch('../../backend/api/auth/login.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const dados = await resposta.json();
+
+                if (dados.sucesso) {
+                    mostrarAlerta(`Bem-vindo(a), ${dados.nome}!`, "success");
+
+                    // Salva os dados no navegador para o usuário continuar logado
+                    localStorage.setItem('id_usuario', dados.id_usuario);
+                    localStorage.setItem('nome_usuario', dados.nome);
+                    localStorage.setItem('tipo_usuario', dados.tipo);
+
+                    // Aguarda 1.5 segundos para a pessoa ler o alerta e redireciona
+                    setTimeout(() => {
+                        if (dados.tipo === 'cliente') {
+
+                            // É ESTA LINHA QUE MANDA O CLIENTE PARA A PÁGINA DE BUSCA
+                            window.location.href = '../Busca-Servicos/servicos.html';
+
+                        } else if (dados.tipo === 'prestador') {
+                            window.location.href = '../Agenda - Prestador/index.html';
+                        } else {
+                            window.location.href = '../index.html';
+                        }
+                    }, 1500); // 1500 milissegundos = 1,5 segundos de espera
+
+                } else {
+                    mostrarAlerta(dados.erro, "danger");
+                }
+            } catch (erro) {
+                console.error('Erro na requisição:', erro);
+                mostrarAlerta("Erro ao conectar com o servidor. Verifique o console.", "danger");
             }
         });
     }
@@ -45,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const senha = formRegistrarCliente.querySelector(".reg-senha").value.trim();
             const confirmarSenha = formRegistrarCliente.querySelector(".reg-confirmar-senha").value.trim();
             const cep = formRegistrarCliente.querySelector(".reg-cep").value.trim();
-            
+
             // Verifica se o campo telefone existe (para evitar erro se você não tiver colocado no HTML ainda)
             const telefoneInput = formRegistrarCliente.querySelector(".reg-telefone");
             const telefone = telefoneInput ? telefoneInput.value.trim() : "00000000000";
@@ -83,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Trata a resposta do PHP
                 if (dados.sucesso) {
                     mostrarAlerta(dados.mensagem, "success");
-                    
+
                     // Redireciona para o login após 2 segundos
                     setTimeout(() => {
                         window.location.href = '../login-form/login.html';
@@ -111,9 +155,9 @@ document.addEventListener("DOMContentLoaded", function () {
             const opcaoSelecionada = formRegistrarPrestador.querySelector(".reg-opcao").value;
             const descricao = formRegistrarPrestador.querySelector(".reg-descricao").value.trim();
             const termosCheck = document.getElementById("flexCheckDefault") ? document.getElementById("flexCheckDefault").checked : false;
-            
+
             if (nome === "" || email === "" || senha === "" || confirmarSenha === "" || cep === "" || opcaoSelecionada === "" || descricao === "" || !termosCheck) {
-                evento.preventDefault(); 
+                evento.preventDefault();
                 mostrarAlerta("Preencha todos os campos e aceite os termos.", "warning");
             }
         });
