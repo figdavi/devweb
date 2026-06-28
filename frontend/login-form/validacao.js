@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     method: 'POST',
                     body: formData
                 });
-
+                console.log(resposta);
                 const dados = await resposta.json();
 
                 // Trata a resposta do PHP
