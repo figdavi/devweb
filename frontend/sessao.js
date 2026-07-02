@@ -4,12 +4,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const nomeUsuario = localStorage.getItem("nome_usuario");
     const tipoUsuario = localStorage.getItem("tipo_usuario");
 
-    // Se não tiver ID no localStorage, significa que não fez login
     if (!idUsuario) {
-        // Redireciona de volta para a tela de login
-        // (Ajuste o caminho '../login-form/login.html' conforme a posição do arquivo HTML atual)
         window.location.href = "../login-form/login.html";
-        return; // Interrompe a execução do resto do código
+        return;
+    }
+
+    // Verifica tipo de usuário exigido pela página (atributo data-tipo-required no <body>)
+    const tipoExigido = document.body.dataset.tipoRequired;
+    if (tipoExigido && tipoUsuario !== tipoExigido) {
+        window.location.href = "../login-form/login.html";
+        return;
     }
 
     // 2. Lógica do botão Sair

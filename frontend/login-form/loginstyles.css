@@ -1,5 +1,33 @@
-html,body{
-    height:100%;
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap');
+
+body {
+    font-family: 'Ubuntu', sans-serif;
+}
+
+/* Pin the logo link to the top as a full-width header bar */
+form > a {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #1A1A2E;
+    padding: 10px 20px;
+    z-index: 10;
+}
+
+form > a img {
+    height: 50px;
+}
+
+/* Push body content below the fixed header */
+body {
+    padding-top: 70px;
+}
+
+.nome {
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: 400;
+    color: #F4F4F0;
 }
 
 .form-container {

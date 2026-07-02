@@ -6,8 +6,9 @@
     <title>Perfil Cliente – Servixus</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="../Busca-Servicos/styles.css">
+    <script>if(!localStorage.getItem("id_usuario")||localStorage.getItem("tipo_usuario")!=="cliente")location.replace("../login-form/login.html");</script>
   </head>
-  <body>
+  <body data-tipo-required="cliente">
     <header>
       <div class="header-esquerda">
         <div class="logonome">
@@ -15,8 +16,9 @@
           <h1 class="nome">Servixus</h1>
         </div>
         <nav class="menu-navegacao">
+          <a href="../Busca-Servicos/servicos.html" class="info">Buscar Serviços</a>
           <a href="../Agendamentos-Cliente/agendamentos.html" class="info">Meus Agendamentos</a>
-          <a href="#" class="info">Meu Perfil</a>
+          <a href="#" class="info">Perfil</a>
         </nav>
       </div>
       <div class="header-botoes">

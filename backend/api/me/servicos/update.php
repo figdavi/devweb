@@ -13,11 +13,7 @@ $stmt = $con->prepare($sql);
 $stmt->bind_param("sdii", $tipo_cobranca, $preco_base, $id_prestador, $id_servico);
 
 if ($stmt->execute()) {
-    if ($stmt->affected_rows > 0) {
-        echo json_encode(["sucesso" => true, "mensagem" => "Serviço atualizado com sucesso!"]);
-    } else {
-        echo json_encode(["sucesso" => false, "erro" => "Serviço não encontrado."]);
-    }
+    echo json_encode(["sucesso" => true, "mensagem" => "Serviço atualizado com sucesso!"]);
 } else {
     echo json_encode(["sucesso" => false, "erro" => "Erro ao atualizar serviço: " . $stmt->error]);
 }

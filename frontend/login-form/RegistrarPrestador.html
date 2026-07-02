@@ -17,12 +17,16 @@
             </a>
             <h1 class="h3 mb-3 fw-normal">Registrar Prestador</h1>
             <div class="form-floating">
-                <input type="text" class="form-control mb-3 reg-nome" id="floating-input" placeholder="Seu nome">
-                <label for="floating-input">Nome</label>
+                <input type="text" class="form-control mb-3 reg-nome" id="reg-nome" placeholder="Seu nome">
+                <label for="reg-nome">Nome</label>
             </div>
             <div class="form-floating">
-                <input type="email" class="form-control mb-3 reg-email" id="floating-input" placeholder="Seu-email@gmail.com">
-                <label for="floating-input">E-mail</label>
+                <input type="email" class="form-control mb-3 reg-email" id="reg-email" placeholder="Seu-email@gmail.com">
+                <label for="reg-email">E-mail</label>
+            </div>
+            <div class="form-floating">
+                <input type="tel" class="form-control mb-3 reg-telefone" id="reg-telefone" placeholder="Telefone">
+                <label for="reg-telefone">Telefone</label>
             </div>
             <div class="form-floating">
                 <input type="password" class="form-control mb-3 reg-senha" id="floating-input" placeholder="Senha">
@@ -38,15 +42,10 @@
                 <label for="floating-input">Seu CEP (Apenas Números)</label>
             </div>
             <div class="form-floating mb-3">
-                <select class="form-select reg-opcao" id="floatingSelect" aria-label="Escolha uma opção">
-                    <option selected disabled value="">Selecione uma opção...</option>
-                    <option value="1">Pedreiro</option>
-                    <option value="2">Eletricista</option>
-                    <option value="3">Pintor</option>
-                    <option value="4">Marceneiro</option>
-                    <option value="5">Limpeza</option>
+                <select class="form-select reg-opcao" id="floatingSelect">
+                    <option selected disabled value="">Carregando categorias...</option>
                 </select>
-                <label for="floatingSelect">Escolha o Tipo de Serviço</label>
+                <label for="floatingSelect">Categoria de Serviço</label>
             </div>
             <div class="form-floating">
                 <textarea class="form-control reg-descricao" id="floatingTextarea" placeholder="Digite aqui"

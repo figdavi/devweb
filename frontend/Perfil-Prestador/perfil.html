@@ -6,8 +6,9 @@
     <title>Perfil Prestador – Servixus</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="../Busca-Servicos/styles.css">
+    <script>if(!localStorage.getItem("id_usuario")||localStorage.getItem("tipo_usuario")!=="prestador")location.replace("../login-form/login.html");</script>
   </head>
-  <body>
+  <body data-tipo-required="prestador">
     <header>
       <div class="header-esquerda">
         <div class="logonome">
@@ -16,7 +17,8 @@
         </div>
         <nav class="menu-navegacao">
           <a href="../Agenda - Prestador/agenda.html" class="info">Minha Agenda</a>
-          <a href="#" class="info">Meu Perfil</a>
+          <a href="../MeusServicos - Prestador/MeusServiços.html" class="info">Meus Serviços</a>
+          <a href="#" class="info">Perfil</a>
         </nav>
       </div>
       <div class="header-botoes">
@@ -104,20 +106,6 @@
           </form>
         </div>
 
-        <!-- Meus Serviços -->
-        <div class="card p-4 shadow mb-4">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">Meus Serviços</h5>
-            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalAdicionarServico">
-              + Adicionar
-            </button>
-          </div>
-          <div id="containerAlertaServicos"></div>
-          <div id="listaServicos">
-            <p class="text-secondary small" id="semServicos">Carregando...</p>
-          </div>
-        </div>
-
         <!-- Alterar senha -->
         <div class="card p-4 shadow mb-4">
           <h5 class="mb-3">Alterar senha</h5>
@@ -144,45 +132,6 @@
 
       </div>
     </main>
-
-    <!-- Modal: Adicionar Serviço -->
-    <div class="modal fade" id="modalAdicionarServico" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Adicionar Serviço</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <div id="containerAlertaModalServico"></div>
-            <form id="formAdicionarServico">
-              <div class="form-floating mb-3">
-                <select class="form-select" id="servicoSelect">
-                  <option value="" disabled selected>Selecione um serviço</option>
-                </select>
-                <label for="servicoSelect">Serviço</label>
-              </div>
-              <div class="form-floating mb-3">
-                <select class="form-select" id="servicoTipoCobranca">
-                  <option value="hora">Por hora</option>
-                  <option value="diaria">Por diária</option>
-                  <option value="servico">Por serviço</option>
-                </select>
-                <label for="servicoTipoCobranca">Tipo de cobrança</label>
-              </div>
-              <div class="form-floating mb-3">
-                <input type="number" class="form-control" id="servicoPreco" placeholder="Preço base" min="0" step="0.01">
-                <label for="servicoPreco">Preço base (R$)</label>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="button" class="btn btn-primary" id="btnSalvarServico">Salvar</button>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- Modal: Confirmar exclusão de conta -->
     <div class="modal fade" id="modalExcluir" tabindex="-1">

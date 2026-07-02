@@ -40,11 +40,7 @@ $stmt = $con->prepare($sql);
 $stmt->bind_param($tipos, ...$params);
 
 if ($stmt->execute()) {
-    if ($stmt->affected_rows > 0) {
-        echo json_encode(["sucesso" => true, "mensagem" => "Local atualizado com sucesso!"]);
-    } else {
-        echo json_encode(["sucesso" => false, "erro" => "Local não encontrado."]);
-    }
+    echo json_encode(["sucesso" => true, "mensagem" => "Local atualizado com sucesso!"]);
 } else {
     echo json_encode(["sucesso" => false, "erro" => "Erro ao atualizar local: " . $stmt->error]);
 }

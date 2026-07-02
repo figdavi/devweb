@@ -30,11 +30,7 @@ $stmt = $con->prepare($sql);
 $stmt->bind_param($tipos, ...$params);
 
 if ($stmt->execute()) {
-    if ($stmt->affected_rows > 0) {
-        echo json_encode(["sucesso" => true, "mensagem" => "Dados atualizados com sucesso!"]);
-    } else {
-        echo json_encode(["sucesso" => false, "erro" => "Usuário não encontrado."]);
-    }
+    echo json_encode(["sucesso" => true, "mensagem" => "Dados atualizados com sucesso!"]);
 } else {
     echo json_encode(["sucesso" => false, "erro" => "Erro ao atualizar: " . $stmt->error]);
 }

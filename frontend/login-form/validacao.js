@@ -137,22 +137,72 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // ==========================================
-    // CADASTRAR PRESTADOR (Apenas Front-end por enquanto)
+    // CADASTRAR PRESTADOR (Integrado com Back-end)
     // ==========================================
-    if (formRegistrarPrestador) {
-        formRegistrarPrestador.addEventListener("submit", function (evento) {
-            const nome = formRegistrarPrestador.querySelector(".reg-nome").value.trim();
-            const email = formRegistrarPrestador.querySelector(".reg-email").value.trim();
-            const senha = formRegistrarPrestador.querySelector(".reg-senha").value.trim();
-            const confirmarSenha = formRegistrarPrestador.querySelector(".reg-confirmar-senha").value.trim();
-            const cep = formRegistrarPrestador.querySelector(".reg-cep").value.trim();
-            const opcaoSelecionada = formRegistrarPrestador.querySelector(".reg-opcao").value;
-            const descricao = formRegistrarPrestador.querySelector(".reg-descricao").value.trim();
-            const termosCheck = document.getElementById("flexCheckDefault") ? document.getElementById("flexCheckDefault").checked : false;
 
-            if (nome === "" || email === "" || senha === "" || confirmarSenha === "" || cep === "" || opcaoSelecionada === "" || descricao === "" || !termosCheck) {
-                evento.preventDefault();
+    // Carrega categorias no select ao abrir a página de registro
+    const selectCategoria = document.querySelector(".reg-opcao");
+    if (selectCategoria) {
+        fetch('../../backend/api/catalogo/categorias_list.php')
+            .then(r => r.json())
+            .then(dados => {
+                if (Array.isArray(dados)) {
+                    selectCategoria.innerHTML = '<option selected disabled value="">Selecione uma categoria...</option>' +
+                        dados.map(c => `<option value="${c.id_categoria}">${c.nome}</option>`).join('');
+                }
+            })
+            .catch(() => {});
+    }
+
+    if (formRegistrarPrestador) {
+        formRegistrarPrestador.addEventListener("submit", async function (evento) {
+            evento.preventDefault();
+
+            const nome           = formRegistrarPrestador.querySelector(".reg-nome").value.trim();
+            const email          = formRegistrarPrestador.querySelector(".reg-email").value.trim();
+            const telefone       = formRegistrarPrestador.querySelector(".reg-telefone")?.value.trim() ?? "";
+            const senha          = formRegistrarPrestador.querySelector(".reg-senha").value.trim();
+            const confirmarSenha = formRegistrarPrestador.querySelector(".reg-confirmar-senha").value.trim();
+            const cep            = formRegistrarPrestador.querySelector(".reg-cep").value.trim();
+            const id_categoria   = formRegistrarPrestador.querySelector(".reg-opcao").value;
+            const descricao      = formRegistrarPrestador.querySelector(".reg-descricao").value.trim();
+            const termosCheck    = document.getElementById("flexCheckDefault")?.checked ?? false;
+
+            if (!nome || !email || !telefone || !senha || !confirmarSenha || !cep || !id_categoria || !descricao || !termosCheck) {
                 mostrarAlerta("Preencha todos os campos e aceite os termos.", "warning");
+                return;
+            }
+
+            if (senha !== confirmarSenha) {
+                mostrarAlerta("As senhas não coincidem!", "danger");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('nome', nome);
+            formData.append('email', email);
+            formData.append('telefone', telefone);
+            formData.append('senha', senha);
+            formData.append('cep', cep);
+            formData.append('id_categoria', id_categoria);
+            formData.append('descricao_profissional', descricao);
+
+            try {
+                const resposta = await fetch('../../backend/api/auth/cadastro_prestador.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const dados = await resposta.json();
+
+                if (dados.sucesso) {
+                    mostrarAlerta(dados.mensagem, "success");
+                    setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+                } else {
+                    mostrarAlerta(dados.erro, "danger");
+                }
+            } catch (erro) {
+                console.error('Erro na requisição:', erro);
+                mostrarAlerta("Erro ao conectar com o servidor.", "danger");
             }
         });
     }
