@@ -6,6 +6,8 @@ require_once '../conexao.php';
 $id_categoria = $_GET['id_categoria'] ?? null;
 $preco_min    = $_GET['preco_min'] ?? null;
 $preco_max    = $_GET['preco_max'] ?? null;
+$cidade       = $_GET['cidade'] ?? null;
+$estado       = $_GET['estado'] ?? null;
 
 $sql = "SELECT p.id_usuario, u.nome, p.descricao_profissional, p.cidade, p.estado,
                c.nome AS categoria,
@@ -36,6 +38,16 @@ if ($preco_max !== null) {
     $sql .= " AND ps.preco_base <= ?";
     $tipos .= "d";
     $params[] = (float) $preco_max;
+}
+if ($cidade !== null) {
+    $sql .= " AND p.cidade = ?";
+    $tipos .= "s";
+    $params[] = $cidade;
+}
+if ($estado !== null) {
+    $sql .= " AND p.estado = ?";
+    $tipos .= "s";
+    $params[] = $estado;
 }
 
 $sql .= " GROUP BY p.id_usuario ORDER BY media_avaliacao DESC";

@@ -10,10 +10,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         `;
     }
 
-    const containerAlerta       = document.getElementById("containerAlerta");
-    const containerAlertaSenha  = document.getElementById("containerAlertaSenha");
-    const containerAlertaLocais = document.getElementById("containerAlertaLocais");
-    const containerAlertaModal  = document.getElementById("containerAlertaModal");
+    const containerAlerta            = document.getElementById("containerAlerta");
+    const containerAlertaSenha       = document.getElementById("containerAlertaSenha");
+    const containerAlertaLocais      = document.getElementById("containerAlertaLocais");
+    const containerAlertaModal       = document.getElementById("containerAlertaModal");
+    const containerAlertaModalEditar = document.getElementById("containerAlertaModalEditar");
+    const modalEditarLocal           = new bootstrap.Modal(document.getElementById("modalEditarLocal"));
 
     // ── Carregar dados do perfil ───────────────────────────────────────────
     try {
@@ -118,13 +120,20 @@ document.addEventListener("DOMContentLoaded", async function () {
                             ${local.bairro} · ${local.cidade}/${local.estado} · CEP ${local.cep}
                         </div>
                     </div>
-                    <button class="btn btn-outline-danger btn-sm ms-3 flex-shrink-0"
-                            data-id="${local.id_local}">Remover</button>
+                    <div class="d-flex gap-2 ms-3 flex-shrink-0">
+                        <button class="btn btn-outline-secondary btn-sm btn-editar"
+                                data-local='${JSON.stringify(local).replace(/'/g, "&#39;")}'>Editar</button>
+                        <button class="btn btn-outline-danger btn-sm btn-remover"
+                                data-id="${local.id_local}">Remover</button>
+                    </div>
                 </div>
             `).join("");
 
-            lista.querySelectorAll("[data-id]").forEach(btn => {
+            lista.querySelectorAll(".btn-remover").forEach(btn => {
                 btn.addEventListener("click", () => removerLocal(btn.dataset.id));
+            });
+            lista.querySelectorAll(".btn-editar").forEach(btn => {
+                btn.addEventListener("click", () => abrirEditarLocal(JSON.parse(btn.dataset.local)));
             });
         } catch {
             mostrarAlerta(containerAlertaLocais, "Erro ao carregar locais.", "danger");
@@ -148,6 +157,80 @@ document.addEventListener("DOMContentLoaded", async function () {
             mostrarAlerta(containerAlertaLocais, "Erro ao conectar com o servidor.", "danger");
         }
     }
+
+    function abrirEditarLocal(local) {
+        document.getElementById("editarLocalId").value         = local.id_local;
+        document.getElementById("editarLocalNome").value       = local.nome;
+        document.getElementById("editarLocalCep").value        = local.cep;
+        document.getElementById("editarLocalNumero").value     = local.numero;
+        document.getElementById("editarLocalLogradouro").value = local.logradouro;
+        document.getElementById("editarLocalBairro").value     = local.bairro;
+        document.getElementById("editarLocalCidade").value     = local.cidade;
+        document.getElementById("editarLocalEstado").value     = local.estado;
+        document.getElementById("editarLocalComplemento").value = local.complemento ?? "";
+        containerAlertaModalEditar.innerHTML = "";
+        modalEditarLocal.show();
+    }
+
+    // CEP auto-fill no modal de edição
+    document.getElementById("editarLocalCep").addEventListener("blur", async function () {
+        const cep = this.value.replace(/\D/g, "");
+        if (cep.length !== 8) return;
+        try {
+            const resp  = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            const dados = await resp.json();
+            if (dados.erro) { mostrarAlerta(containerAlertaModalEditar, "CEP não encontrado.", "warning"); return; }
+            document.getElementById("editarLocalLogradouro").value = dados.logradouro ?? "";
+            document.getElementById("editarLocalBairro").value     = dados.bairro ?? "";
+            document.getElementById("editarLocalCidade").value     = dados.localidade ?? "";
+            document.getElementById("editarLocalEstado").value     = dados.uf ?? "";
+            document.getElementById("editarLocalNumero").focus();
+        } catch {
+            mostrarAlerta(containerAlertaModalEditar, "Erro ao consultar CEP.", "danger");
+        }
+    });
+
+    document.getElementById("btnSalvarEditarLocal").addEventListener("click", async function () {
+        const id_local    = document.getElementById("editarLocalId").value;
+        const nome        = document.getElementById("editarLocalNome").value.trim();
+        const cep         = document.getElementById("editarLocalCep").value.trim();
+        const numero      = document.getElementById("editarLocalNumero").value.trim();
+        const logradouro  = document.getElementById("editarLocalLogradouro").value.trim();
+        const bairro      = document.getElementById("editarLocalBairro").value.trim();
+        const cidade      = document.getElementById("editarLocalCidade").value.trim();
+        const estado      = document.getElementById("editarLocalEstado").value.trim();
+        const complemento = document.getElementById("editarLocalComplemento").value.trim();
+
+        if (!nome || !cep || !numero || !logradouro) {
+            mostrarAlerta(containerAlertaModalEditar, "Preencha nome, CEP e número.", "warning");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("id_local",   id_local);
+        formData.append("nome",       nome);
+        formData.append("cep",        cep);
+        formData.append("numero",     numero);
+        formData.append("logradouro", logradouro);
+        formData.append("bairro",     bairro);
+        formData.append("cidade",     cidade);
+        formData.append("estado",     estado);
+        formData.append("complemento", complemento);
+
+        try {
+            const resp  = await fetch("../../backend/api/me/locais/update.php", { method: "POST", body: formData });
+            const dados = await resp.json();
+            if (dados.sucesso) {
+                modalEditarLocal.hide();
+                containerAlertaModalEditar.innerHTML = "";
+                carregarLocais();
+            } else {
+                mostrarAlerta(containerAlertaModalEditar, dados.erro, "danger");
+            }
+        } catch {
+            mostrarAlerta(containerAlertaModalEditar, "Erro ao conectar com o servidor.", "danger");
+        }
+    });
 
     // CEP auto-fill via ViaCEP
     document.getElementById("localCep").addEventListener("blur", async function () {

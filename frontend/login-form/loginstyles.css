@@ -5,7 +5,7 @@ body {
 }
 
 /* Pin the logo link to the top as a full-width header bar */
-form > a {
+form > a:first-of-type {
     position: fixed;
     top: 0;
     left: 0;
@@ -15,7 +15,7 @@ form > a {
     z-index: 10;
 }
 
-form > a img {
+form > a:first-of-type img {
     height: 50px;
 }
 

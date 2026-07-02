@@ -9,7 +9,7 @@ $valor          = $_POST['valor'] ?? null;
 $tipo_cobranca  = $_POST['tipo_cobranca'] ?? '';
 
 $sql = "UPDATE agendamentos
-        SET valor = ?, tipo_cobranca = ?, status = 'orcamento_enviado'
+        SET valor = ?, tipo_cobranca = ?, status = 'orcamento_realizado'
         WHERE id_agendamento = ? AND id_prestador = ? AND status = 'aguardando_orcamento'";
 $stmt = $con->prepare($sql);
 $stmt->bind_param("dsii", $valor, $tipo_cobranca, $id_agendamento, $id_prestador);

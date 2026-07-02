@@ -1,4 +1,5 @@
 <?php
+ob_start();
 
 header('Content-Type: application/json');
 require_once '../conexao.php';
@@ -15,11 +16,13 @@ $sqlPerfil = "SELECT p.id_usuario, u.nome, p.descricao_profissional, p.cidade, p
 $stmt = $con->prepare($sqlPerfil);
 $stmt->bind_param("i", $id_usuario);
 $stmt->execute();
-$perfil = $stmt->get_result()->fetch_assoc();
+$res1  = $stmt->get_result();
+$perfil = $res1->fetch_assoc();
+$res1->free();
 $stmt->close();
 
 if (!$perfil) {
-    echo json_encode(["erro" => "Prestador não encontrado."]);
+    ob_clean(); echo json_encode(["erro" => "Prestador não encontrado."]);
     $con->close();
     exit;
 }
@@ -32,9 +35,11 @@ $stmt2 = $con->prepare($sqlServicos);
 $stmt2->bind_param("i", $id_usuario);
 $stmt2->execute();
 $servicos = [];
-while ($s = $stmt2->get_result()->fetch_assoc()) {
+$res2 = $stmt2->get_result();
+while ($s = $res2->fetch_assoc()) {
     $servicos[] = $s;
 }
+$res2->free();
 $stmt2->close();
 
 $sqlAval = "SELECT a.cliente_nota, a.cliente_comentario, u.nome AS nome_cliente
@@ -46,12 +51,14 @@ $stmt3 = $con->prepare($sqlAval);
 $stmt3->bind_param("i", $id_usuario);
 $stmt3->execute();
 $avaliacoes = [];
-while ($av = $stmt3->get_result()->fetch_assoc()) {
+$res3 = $stmt3->get_result();
+while ($av = $res3->fetch_assoc()) {
     $avaliacoes[] = $av;
 }
+$res3->free();
 $stmt3->close();
 $con->close();
 
 $perfil['servicos']   = $servicos;
 $perfil['avaliacoes'] = $avaliacoes;
-echo json_encode($perfil);
+ob_clean(); echo json_encode($perfil);

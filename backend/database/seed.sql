@@ -27,7 +27,7 @@
 --   id | status                | quem              | endpoint para testar
 --   ---+-----------------------+-------------------+-------------------------
 --    1 | aguardando_orcamento  | João → Carlos     | agendamentos/orcamento.php
---    2 | orcamento_enviado     | Maria → Carlos    | agendamentos/confirmar.php
+--    2 | orcamento_realizado   | Maria → Carlos    | agendamentos/confirmar.php
 --                                                  | agendamentos/cancelar.php
 --    3 | confirmado            | João → Ana        | agendamentos/iniciar.php
 --                                                  | agendamentos/cancelar.php
@@ -141,49 +141,49 @@ INSERT INTO agendamentos
     (id_agendamento, id_cliente, id_prestador, id_servico, id_local,
      descricao, tipo_cobranca, valor,
      data_hora_criacao,    data_hora_inicio,      data_hora_fim,
-     cliente_confirmou, prestador_confirmou, status)
+     cliente_confirmou, status)
 VALUES
 -- 1: aguardando_orcamento — testar POST agendamentos/orcamento.php
 (1, 1, 3, 1, 1,
  'Tomada da sala com curto, preciso de ajuda urgente.',
  'hora', 0.00,
  '2026-06-20 10:00:00', '2026-06-28 09:00:00', '2026-06-28 11:00:00',
- FALSE, FALSE, 'aguardando_orcamento'),
+ FALSE, 'aguardando_orcamento'),
 
--- 2: orcamento_enviado — testar POST agendamentos/confirmar.php ou cancelar.php
+-- 2: orcamento_realizado — testar POST agendamentos/confirmar.php ou cancelar.php
 (2, 2, 3, 1, 2,
  'Instalação de 3 tomadas novas na cozinha.',
  'hora', 120.00,
  '2026-06-21 14:00:00', '2026-06-29 10:00:00', '2026-06-29 12:00:00',
- FALSE, FALSE, 'orcamento_enviado'),
+ FALSE, 'orcamento_realizado'),
 
 -- 3: confirmado — testar POST agendamentos/iniciar.php ou cancelar.php
 (3, 1, 4, 2, 1,
  'Pia do banheiro entupida há 2 dias.',
  'servico', 150.00,
  '2026-06-22 09:00:00', '2026-06-30 14:00:00', '2026-06-30 16:00:00',
- TRUE, FALSE, 'confirmado'),
+ TRUE, 'confirmado'),
 
 -- 4: em_andamento — testar POST agendamentos/concluir.php
 (4, 2, 4, 2, 2,
  'Vazamento embaixo da pia da cozinha.',
  'servico', 180.00,
  '2026-06-24 11:00:00', '2026-06-26 09:00:00', '2026-06-26 11:00:00',
- TRUE, FALSE, 'em_andamento'),
+ TRUE, 'em_andamento'),
 
 -- 5: concluido — testar POST avaliacoes/create.php (nota do prestador em aberto)
 (5, 1, 3, 1, 1,
  'Chuveiro elétrico sem funcionar.',
  'hora', 160.00,
  '2026-06-10 10:00:00', '2026-06-15 09:00:00', '2026-06-15 11:00:00',
- TRUE, TRUE, 'concluido'),
+ TRUE, 'concluido'),
 
 -- 6: cancelado — histórico
 (6, 2, 3, 1, 2,
  'Troca de disjuntor.',
  'hora', 0.00,
  '2026-06-19 16:00:00', '2026-06-25 10:00:00', '2026-06-25 12:00:00',
- FALSE, FALSE, 'cancelado');
+ FALSE, 'cancelado');
 
 -- -----------------------------------------------------------------------------
 -- Avaliações

@@ -8,7 +8,7 @@ $id_cliente     = $_POST['id_usuario'] ?? null;
 
 $sql = "UPDATE agendamentos
         SET status = 'confirmado', cliente_confirmou = 1
-        WHERE id_agendamento = ? AND id_cliente = ? AND status = 'orcamento_enviado'";
+        WHERE id_agendamento = ? AND id_cliente = ? AND status = 'orcamento_realizado'";
 $stmt = $con->prepare($sql);
 $stmt->bind_param("ii", $id_agendamento, $id_cliente);
 

@@ -1,4 +1,5 @@
 <?php
+ob_start();
 
 header('Content-Type: application/json');
 require_once '../conexao.php';
@@ -14,7 +15,7 @@ $cep                    = $_POST['cep'] ?? '';
 
 $endereco = buscar_cep($cep);
 if ($endereco === null) {
-    echo json_encode(["sucesso" => false, "erro" => "CEP inválido ou não encontrado."]);
+    ob_clean(); echo json_encode(["sucesso" => false, "erro" => "CEP inválido ou não encontrado."]);
     exit;
 }
 
@@ -31,7 +32,7 @@ $stmt->bind_param("ssss", $email, $senha, $nome, $telefone);
 
 if (!$stmt->execute()) {
     $con->rollback();
-    echo json_encode(["sucesso" => false, "erro" => "E-mail já cadastrado."]);
+    ob_clean(); echo json_encode(["sucesso" => false, "erro" => "E-mail já cadastrado."]);
     $stmt->close();
     $con->close();
     exit;
@@ -47,10 +48,10 @@ $stmt2->bind_param("iissssss", $id_usuario, $id_categoria, $descricao_profission
 
 if ($stmt2->execute()) {
     $con->commit();
-    echo json_encode(["sucesso" => true, "mensagem" => "Prestador cadastrado com sucesso!", "id_usuario" => $id_usuario]);
+    ob_clean(); echo json_encode(["sucesso" => true, "mensagem" => "Prestador cadastrado com sucesso!", "id_usuario" => $id_usuario]);
 } else {
     $con->rollback();
-    echo json_encode(["sucesso" => false, "erro" => "Erro ao cadastrar prestador: " . $stmt2->error]);
+    ob_clean(); echo json_encode(["sucesso" => false, "erro" => "Erro ao cadastrar prestador: " . $stmt2->error]);
 }
 
 $stmt2->close();

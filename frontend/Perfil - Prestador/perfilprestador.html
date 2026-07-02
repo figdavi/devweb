@@ -76,19 +76,63 @@
               </select>
               <label>Serviço</label>
             </div>
+            <p class="text-secondary small mb-3" id="agendarPrecoBase" style="display:none">
+              Referência de preço do prestador: <span id="agendarPrecoBaseTexto"></span>.
+              O valor final será definido pelo prestador no orçamento.
+            </p>
             <div class="form-floating mb-3">
               <select class="form-select" id="agendarLocal">
                 <option value="" disabled selected>Selecione seu local</option>
               </select>
               <label>Local de atendimento</label>
             </div>
+            <p class="text-secondary small mb-1">Início</p>
+            <div class="row g-2 mb-1">
+              <div class="col-7">
+                <div class="form-floating">
+                  <select class="form-select" id="agendarDiaInicio" disabled>
+                    <option value="" selected>Carregando...</option>
+                  </select>
+                  <label>Dia</label>
+                </div>
+              </div>
+              <div class="col-5">
+                <div class="form-floating">
+                  <select class="form-select" id="agendarHoraInicio" disabled>
+                    <option value="" selected>Horário</option>
+                  </select>
+                  <label>Horário</label>
+                </div>
+              </div>
+            </div>
+            <p class="text-secondary small mb-1" id="agendarInicioOcupados" style="display:none"></p>
+            <p class="text-danger small mb-3" id="agendarInicioAviso" style="display:none"></p>
+
+            <p class="text-secondary small mb-1">Término</p>
+            <div class="row g-2 mb-3">
+              <div class="col-7">
+                <div class="form-floating">
+                  <select class="form-select" id="agendarDiaFim" disabled>
+                    <option value="" selected>Selecione o início primeiro</option>
+                  </select>
+                  <label>Dia</label>
+                </div>
+              </div>
+              <div class="col-5">
+                <div class="form-floating">
+                  <select class="form-select" id="agendarHoraFim" disabled>
+                    <option value="" selected>Horário</option>
+                  </select>
+                  <label>Horário</label>
+                </div>
+              </div>
+            </div>
+            <p class="text-secondary small mb-1" id="agendarFimOcupados" style="display:none"></p>
+            <p class="text-danger small mb-3" id="agendarFimAviso" style="display:none"></p>
+
             <div class="form-floating mb-3">
               <textarea class="form-control" id="agendarDescricao" placeholder="Descrição" style="height:80px"></textarea>
               <label>Descrição (opcional)</label>
-            </div>
-            <div class="form-floating">
-              <input type="datetime-local" class="form-control" id="agendarDataInicio">
-              <label>Data e hora preferida</label>
             </div>
           </div>
           <div class="modal-footer">

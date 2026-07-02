@@ -73,27 +73,47 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==========================================
     // CADASTRAR CLIENTE (Integrado com Back-end)
     // ==========================================
+
+    // CEP auto-fill na página de registro de cliente
+    const regCepInput = document.getElementById("regCep");
+    if (regCepInput) {
+        regCepInput.addEventListener("blur", async function () {
+            const cep = this.value.replace(/\D/g, "");
+            if (cep.length !== 8) return;
+            try {
+                const resp  = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                const dados = await resp.json();
+                if (dados.erro) { mostrarAlerta("CEP não encontrado.", "warning"); return; }
+                document.getElementById("regLogradouro").value = dados.logradouro ?? "";
+                document.getElementById("regCidade").value     = dados.localidade ?? "";
+                document.getElementById("regEstado").value     = dados.uf ?? "";
+                document.getElementById("regEnderecoContainer").style.display      = "";
+                document.getElementById("regEnderecoCidadeContainer").style.display = "";
+                document.getElementById("regNumero").focus();
+            } catch {
+                mostrarAlerta("Erro ao consultar CEP.", "danger");
+            }
+        });
+    }
+
     if (formRegistrarCliente) {
         formRegistrarCliente.addEventListener("submit", async function (evento) {
-            evento.preventDefault(); // Impede o recarregamento da página
+            evento.preventDefault();
 
-            // Captura os valores
-            const nome = formRegistrarCliente.querySelector(".reg-nome").value.trim();
-            const email = formRegistrarCliente.querySelector(".reg-email").value.trim();
-            const senha = formRegistrarCliente.querySelector(".reg-senha").value.trim();
+            const nome           = formRegistrarCliente.querySelector(".reg-nome").value.trim();
+            const email          = formRegistrarCliente.querySelector(".reg-email").value.trim();
+            const senha          = formRegistrarCliente.querySelector(".reg-senha").value.trim();
             const confirmarSenha = formRegistrarCliente.querySelector(".reg-confirmar-senha").value.trim();
-            const cep = formRegistrarCliente.querySelector(".reg-cep").value.trim();
+            const cep            = formRegistrarCliente.querySelector(".reg-cep").value.trim();
+            const numero         = formRegistrarCliente.querySelector(".reg-numero")?.value.trim() ?? "";
+            const complemento    = formRegistrarCliente.querySelector(".reg-complemento")?.value.trim() ?? "";
+            const nome_local     = formRegistrarCliente.querySelector(".reg-nome-local")?.value.trim() || "Casa";
+            const telefone       = formRegistrarCliente.querySelector(".reg-telefone")?.value.trim() ?? "";
+            const termosCheck    = document.getElementById("flexCheckDefault")?.checked ?? false;
 
-            // Verifica se o campo telefone existe (para evitar erro se você não tiver colocado no HTML ainda)
-            const telefoneInput = formRegistrarCliente.querySelector(".reg-telefone");
-            const telefone = telefoneInput ? telefoneInput.value.trim() : "00000000000";
-
-            const termosCheck = document.getElementById("flexCheckDefault") ? document.getElementById("flexCheckDefault").checked : false;
-
-            // Validações no Front-end
-            if (nome === "" || email === "" || senha === "" || confirmarSenha === "" || cep === "" || !termosCheck) {
-                mostrarAlerta("Preencha todos os campos e aceite os termos.", "warning");
-                return; // Para a execução aqui
+            if (!nome || !email || !senha || !confirmarSenha || !cep || !numero || !termosCheck) {
+                mostrarAlerta("Preencha todos os campos obrigatórios e aceite os termos.", "warning");
+                return;
             }
 
             if (senha !== confirmarSenha) {
@@ -101,37 +121,36 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            // Monta os dados para o PHP
             const formData = new FormData();
             formData.append('nome', nome);
             formData.append('email', email);
             formData.append('telefone', telefone);
             formData.append('senha', senha);
             formData.append('cep', cep);
+            formData.append('numero', numero);
+            formData.append('complemento', complemento);
+            formData.append('nome_local', nome_local);
 
             try {
-                // Faz a requisição para o back-end
                 const resposta = await fetch('../../backend/api/auth/cadastro_cliente.php', {
                     method: 'POST',
                     body: formData
                 });
-                console.log(resposta);
-                const dados = await resposta.json();
+                const texto = await resposta.text();
+                let dados;
+                try { dados = JSON.parse(texto); } catch {
+                    mostrarAlerta("Ocorreu um erro inesperado no servidor. Tente novamente.", "danger");
+                    return;
+                }
 
-                // Trata a resposta do PHP
                 if (dados.sucesso) {
                     mostrarAlerta(dados.mensagem, "success");
-
-                    // Redireciona para o login após 2 segundos
-                    setTimeout(() => {
-                        window.location.href = '../login-form/login.html';
-                    }, 2000);
+                    setTimeout(() => { window.location.href = '../login-form/login.html'; }, 2000);
                 } else {
                     mostrarAlerta(dados.erro, "danger");
                 }
-            } catch (erro) {
-                console.error('Erro na requisição:', erro);
-                mostrarAlerta("Erro ao conectar com o servidor. Verifique se o back-end está rodando.", "danger");
+            } catch {
+                mostrarAlerta("Não foi possível conectar ao servidor.", "danger");
             }
         });
     }
@@ -192,7 +211,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     method: 'POST',
                     body: formData
                 });
-                const dados = await resposta.json();
+                const texto = await resposta.text();
+                let dados;
+                try { dados = JSON.parse(texto); } catch {
+                    mostrarAlerta("Ocorreu um erro inesperado no servidor. Tente novamente.", "danger");
+                    return;
+                }
 
                 if (dados.sucesso) {
                     mostrarAlerta(dados.mensagem, "success");
@@ -200,9 +224,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 } else {
                     mostrarAlerta(dados.erro, "danger");
                 }
-            } catch (erro) {
-                console.error('Erro na requisição:', erro);
-                mostrarAlerta("Erro ao conectar com o servidor.", "danger");
+            } catch {
+                mostrarAlerta("Não foi possível conectar ao servidor.", "danger");
             }
         });
     }

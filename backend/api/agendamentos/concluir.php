@@ -9,7 +9,7 @@ $id_prestador   = $_POST['id_usuario'] ?? null;
 $con->begin_transaction();
 
 $sqlUpd = "UPDATE agendamentos
-           SET status = 'concluido', prestador_confirmou = 1
+           SET status = 'concluido'
            WHERE id_agendamento = ? AND id_prestador = ? AND status = 'em_andamento'";
 $stmt = $con->prepare($sqlUpd);
 $stmt->bind_param("ii", $id_agendamento, $id_prestador);

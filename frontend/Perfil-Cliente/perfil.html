@@ -158,6 +158,72 @@
       </div>
     </div>
 
+    <!-- Modal: Editar Local -->
+    <div class="modal fade" id="modalEditarLocal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Editar Local</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div id="containerAlertaModalEditar"></div>
+            <input type="hidden" id="editarLocalId">
+            <form id="formEditarLocal">
+              <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="editarLocalNome" placeholder="Nome do local">
+                <label for="editarLocalNome">Nome (ex: Casa, Trabalho)</label>
+              </div>
+              <div class="row g-2 mb-3">
+                <div class="col-8">
+                  <div class="form-floating">
+                    <input type="text" class="form-control" id="editarLocalCep" placeholder="CEP" maxlength="9">
+                    <label for="editarLocalCep">CEP</label>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="form-floating">
+                    <input type="text" class="form-control" id="editarLocalNumero" placeholder="Número">
+                    <label for="editarLocalNumero">Número</label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="editarLocalLogradouro" placeholder="Logradouro" readonly>
+                <label for="editarLocalLogradouro">Logradouro</label>
+              </div>
+              <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="editarLocalBairro" placeholder="Bairro" readonly>
+                <label for="editarLocalBairro">Bairro</label>
+              </div>
+              <div class="row g-2 mb-3">
+                <div class="col-8">
+                  <div class="form-floating">
+                    <input type="text" class="form-control" id="editarLocalCidade" placeholder="Cidade" readonly>
+                    <label for="editarLocalCidade">Cidade</label>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="form-floating">
+                    <input type="text" class="form-control" id="editarLocalEstado" placeholder="Estado" readonly>
+                    <label for="editarLocalEstado">Estado</label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="editarLocalComplemento" placeholder="Complemento">
+                <label for="editarLocalComplemento">Complemento (opcional)</label>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-primary" id="btnSalvarEditarLocal">Salvar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal: Confirmar exclusão de conta -->
     <div class="modal fade" id="modalExcluir" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">

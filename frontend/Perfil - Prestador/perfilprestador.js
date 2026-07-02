@@ -33,14 +33,19 @@ document.addEventListener("DOMContentLoaded", async function () {
     // ── Carregar perfil ────────────────────────────────────────────────────
     let dados;
     try {
-        const resp = await fetch(`../../backend/api/prestadores/get.php?id_usuario=${id_prestador}`);
-        dados = await resp.json();
+        const resp  = await fetch(`../../backend/api/prestadores/get.php?id_usuario=${id_prestador}`);
+        const texto = await resp.text();
+        try { dados = JSON.parse(texto); } catch {
+            console.error("Resposta não-JSON do servidor:", texto);
+            alerta(containerAlerta, "Erro inesperado no servidor. Tente novamente.");
+            return;
+        }
         if (dados.erro) {
             alerta(containerAlerta, "Prestador não encontrado.");
             return;
         }
     } catch {
-        alerta(containerAlerta, "Erro ao carregar perfil.");
+        alerta(containerAlerta, "Não foi possível conectar ao servidor.");
         return;
     }
 
@@ -89,12 +94,24 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     document.getElementById("btnAgendar").classList.remove("d-none");
 
-    // Populate service select
-    const selectServico = document.getElementById("agendarServico");
+    // Populate service select; show base price as reference only (final price is
+    // set by the prestador later, via the orçamento step)
+    const selectServico  = document.getElementById("agendarServico");
+    const precoBaseRow   = document.getElementById("agendarPrecoBase");
+    const precoBaseTexto = document.getElementById("agendarPrecoBaseTexto");
+    const servicosMap    = Object.fromEntries((dados.servicos || []).map(s => [s.id_servico, s]));
+
     selectServico.innerHTML = '<option value="" disabled selected>Selecione um serviço</option>' +
         (dados.servicos || []).map(s =>
-            `<option value="${s.id_servico}">${s.titulo} – R$ ${parseFloat(s.preco_base).toFixed(2).replace(".", ",")}${LABELS[s.tipo_cobranca] ?? ""}</option>`
+            `<option value="${s.id_servico}">${s.titulo}</option>`
         ).join("");
+
+    selectServico.addEventListener("change", function () {
+        const s = servicosMap[this.value];
+        if (!s) return;
+        precoBaseTexto.textContent = `R$ ${parseFloat(s.preco_base).toFixed(2).replace(".", ",")}${LABELS[s.tipo_cobranca] ?? ""}`;
+        precoBaseRow.style.display = "";
+    });
 
     // Fetch and populate client locais
     try {
@@ -111,16 +128,217 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     } catch {}
 
+    // ── Seleção de dia + horário (início e término) ──────────────────────────
+    const selectDiaInicio  = document.getElementById("agendarDiaInicio");
+    const selectHoraInicio = document.getElementById("agendarHoraInicio");
+    const avisoInicio      = document.getElementById("agendarInicioAviso");
+    const selectDiaFim     = document.getElementById("agendarDiaFim");
+    const selectHoraFim    = document.getElementById("agendarHoraFim");
+    const avisoFim         = document.getElementById("agendarFimAviso");
+    const ocupadosInicioEl = document.getElementById("agendarInicioOcupados");
+    const ocupadosFimEl    = document.getElementById("agendarFimOcupados");
+
+    const DIAS_SEMANA_LABEL = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+    const janelaCache = {}; // cache de disponibilidade.php por data, evita refetch
+
+    let diasDisponiveis = new Set();
+    try {
+        const respDias = await fetch(`../../backend/api/prestadores/dias_disponiveis.php?id_prestador=${id_prestador}`);
+        const diasJson = await respDias.json();
+        diasDisponiveis = new Set(diasJson.dias || []);
+    } catch {}
+
+    function toISODate(d) {
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    function formatarDiaLabel(d) {
+        return `${DIAS_SEMANA_LABEL[d.getDay()]}, ${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}`;
+    }
+
+    // Gera a lista dos próximos dias em que o prestador atende, a partir de `desde` (Date)
+    function gerarDiasDisponiveis(desde, quantidade = 60) {
+        const dias = [];
+        const cursor = new Date(desde);
+        cursor.setHours(0, 0, 0, 0);
+        for (let i = 0; dias.length < 30 && i < quantidade; i++) {
+            if (diasDisponiveis.has(cursor.getDay())) {
+                dias.push({ iso: toISODate(cursor), label: formatarDiaLabel(cursor) });
+            }
+            cursor.setDate(cursor.getDate() + 1);
+        }
+        return dias;
+    }
+
+    async function buscarJanela(iso) {
+        if (janelaCache[iso]) return janelaCache[iso];
+        const resp = await fetch(`../../backend/api/prestadores/disponibilidade.php?id_prestador=${id_prestador}&data=${iso}`);
+        const dadosDisp = await resp.json();
+        janelaCache[iso] = dadosDisp;
+        return dadosDisp;
+    }
+
+    function exibirOcupados(el, ocupados) {
+        if (!ocupados?.length) {
+            el.style.display = "none";
+            return;
+        }
+        el.textContent = "Já reservado neste dia: " + ocupados.map(o => `${o.inicio}–${o.fim}`).join(", ");
+        el.style.display = "";
+    }
+
+    // Um agendamento que se estende por vários dias ocupa o dia inteiro do "meio",
+    // então qualquer reserva existente nesse dia com início após `apartirDe` (ou
+    // qualquer reserva, se apartirDe for nulo) limita o horário de término máximo.
+    function calcularCorteOcupados(ocupados, apartirDe) {
+        let corte = null;
+        for (const o of ocupados || []) {
+            if (apartirDe && o.inicio <= apartirDe) continue;
+            if (corte === null || o.inicio < corte) corte = o.inicio;
+        }
+        return corte;
+    }
+
+    function gerarHorariosJanela(janela, apartirDe = null, ocupados = []) {
+        const horarios = [];
+        const corte = calcularCorteOcupados(ocupados, apartirDe);
+        let [h, m] = janela.inicio.split(":").map(Number);
+        const [hFim, mFim] = janela.fim.split(":").map(Number);
+        while (h < hFim || (h === hFim && m <= mFim)) {
+            const horaStr = `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`;
+            const depoisDoInicio = !apartirDe || horaStr > apartirDe;
+            const antesDoCorte   = !corte || horaStr <= corte;
+            if (depoisDoInicio && antesDoCorte) horarios.push(horaStr);
+            m += 30;
+            if (m >= 60) { m -= 60; h += 1; }
+        }
+        return horarios;
+    }
+
+    // ── Dia de início ─────────────────────────────────────────────────────────
+    const diasInicio = gerarDiasDisponiveis(new Date());
+    selectDiaInicio.innerHTML = '<option value="" disabled selected>Selecione um dia</option>' +
+        diasInicio.map(d => `<option value="${d.iso}">${d.label}</option>`).join("");
+    selectDiaInicio.disabled = diasInicio.length === 0;
+    if (diasInicio.length === 0) {
+        avisoInicio.textContent = "O prestador não possui horários de atendimento cadastrados.";
+        avisoInicio.style.display = "";
+    }
+
+    selectDiaInicio.addEventListener("change", async function () {
+        const iso = this.value;
+        selectHoraInicio.innerHTML = '<option value="" selected>Carregando...</option>';
+        selectHoraInicio.disabled = true;
+        avisoInicio.style.display = "none";
+        ocupadosInicioEl.style.display = "none";
+        resetarTermino();
+
+        const dadosDisp = await buscarJanela(iso);
+        exibirOcupados(ocupadosInicioEl, dadosDisp.ocupados);
+
+        if (!dadosDisp.slots?.length) {
+            selectHoraInicio.innerHTML = '<option value="" selected>Nenhum horário disponível</option>';
+            avisoInicio.textContent = dadosDisp.mensagem ?? "Nenhum horário disponível neste dia.";
+            avisoInicio.style.display = "";
+            return;
+        }
+
+        selectHoraInicio.innerHTML = '<option value="" disabled selected>Selecione um horário</option>' +
+            dadosDisp.slots.map(s => `<option value="${s.inicio}">${s.inicio}</option>`).join("");
+        selectHoraInicio.disabled = false;
+    });
+
+    selectHoraInicio.addEventListener("change", function () {
+        if (!this.value) return;
+        popularDiaFim();
+    });
+
+    // ── Dia de término ────────────────────────────────────────────────────────
+    function resetarTermino() {
+        selectDiaFim.innerHTML  = '<option value="" selected>Selecione o início primeiro</option>';
+        selectDiaFim.disabled   = true;
+        selectHoraFim.innerHTML = '<option value="" selected>Horário</option>';
+        selectHoraFim.disabled  = true;
+        avisoFim.style.display  = "none";
+        ocupadosFimEl.style.display = "none";
+    }
+
+    function popularDiaFim() {
+        const diaInicioIso = selectDiaInicio.value;
+        const diasFim = gerarDiasDisponiveis(new Date(diaInicioIso + "T00:00:00"));
+        selectDiaFim.innerHTML = '<option value="" disabled selected>Selecione um dia</option>' +
+            diasFim.map(d => `<option value="${d.iso}">${d.label}</option>`).join("");
+        selectDiaFim.disabled = false;
+        selectHoraFim.innerHTML = '<option value="" selected>Horário</option>';
+        selectHoraFim.disabled = true;
+        avisoFim.style.display = "none";
+        ocupadosFimEl.style.display = "none";
+    }
+
+    selectDiaFim.addEventListener("change", async function () {
+        const iso = this.value;
+        selectHoraFim.innerHTML = '<option value="" selected>Carregando...</option>';
+        selectHoraFim.disabled = true;
+        avisoFim.style.display = "none";
+        ocupadosFimEl.style.display = "none";
+
+        const dadosDisp = await buscarJanela(iso);
+        exibirOcupados(ocupadosFimEl, dadosDisp.ocupados);
+
+        if (!dadosDisp.janela) {
+            selectHoraFim.innerHTML = '<option value="" selected>Indisponível</option>';
+            avisoFim.textContent = dadosDisp.mensagem ?? "Prestador não atende neste dia.";
+            avisoFim.style.display = "";
+            return;
+        }
+
+        const mesmoDia = iso === selectDiaInicio.value;
+        const horarios = gerarHorariosJanela(dadosDisp.janela, mesmoDia ? selectHoraInicio.value : null, dadosDisp.ocupados);
+
+        if (!horarios.length) {
+            selectHoraFim.innerHTML = '<option value="" selected>Nenhum horário disponível</option>';
+            avisoFim.textContent = "Nenhum horário de término disponível neste dia.";
+            avisoFim.style.display = "";
+            return;
+        }
+
+        selectHoraFim.innerHTML = '<option value="" disabled selected>Selecione um horário</option>' +
+            horarios.map(h => `<option value="${h}">${h}</option>`).join("");
+        selectHoraFim.disabled = false;
+    });
+
+    resetarTermino();
+
     // Submit booking
     document.getElementById("btnConfirmarAgendamento").addEventListener("click", async function () {
-        const id_servico       = document.getElementById("agendarServico").value;
-        const id_local         = document.getElementById("agendarLocal").value;
-        const descricao        = document.getElementById("agendarDescricao").value.trim();
-        const data_hora_inicio = document.getElementById("agendarDataInicio").value;
-        const containerModal   = document.getElementById("containerAlertaModal");
+        const id_servico    = document.getElementById("agendarServico").value;
+        const id_local      = document.getElementById("agendarLocal").value;
+        const descricao     = document.getElementById("agendarDescricao").value.trim();
+        const containerModal = document.getElementById("containerAlertaModal");
+
+        const diaInicio  = selectDiaInicio.value;
+        const horaInicio = selectHoraInicio.value;
+        const diaFim     = selectDiaFim.value;
+        const horaFim    = selectHoraFim.value;
 
         if (!id_servico || !id_local) {
             alerta(containerModal, "Selecione um serviço e um local.", "warning");
+            return;
+        }
+        if (!diaInicio || !horaInicio) {
+            alerta(containerModal, "Selecione o dia e horário de início.", "warning");
+            return;
+        }
+        if (!diaFim || !horaFim) {
+            alerta(containerModal, "Selecione o dia e horário de término.", "warning");
+            return;
+        }
+
+        const dataHoraInicio = `${diaInicio}T${horaInicio}`;
+        const dataHoraFim    = `${diaFim}T${horaFim}`;
+
+        if (new Date(dataHoraFim) <= new Date(dataHoraInicio)) {
+            alerta(containerModal, "A data e hora de término devem ser posteriores ao início.", "warning");
             return;
         }
 
@@ -130,12 +348,18 @@ document.addEventListener("DOMContentLoaded", async function () {
         fd.append("id_servico",       id_servico);
         fd.append("id_local",         id_local);
         fd.append("descricao",        descricao);
-        fd.append("data_hora_inicio", data_hora_inicio);
-        fd.append("data_hora_fim",    "");
+        fd.append("data_hora_inicio", dataHoraInicio);
+        fd.append("data_hora_fim",    dataHoraFim);
 
         try {
             const resp   = await fetch("../../backend/api/agendamentos/create.php", { method: "POST", body: fd });
-            const result = await resp.json();
+            const texto  = await resp.text();
+            let result;
+            try { result = JSON.parse(texto); } catch {
+                console.error("Resposta não-JSON:", texto);
+                alerta(containerModal, "Erro inesperado no servidor. Tente novamente.", "danger");
+                return;
+            }
             if (result.sucesso) {
                 bootstrap.Modal.getInstance(document.getElementById("modalAgendar")).hide();
                 alerta(containerAlerta, "Solicitação enviada! Aguarde o orçamento do prestador.", "success");
@@ -143,7 +367,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 alerta(containerModal, result.erro || "Erro ao criar agendamento.", "danger");
             }
         } catch {
-            alerta(containerModal, "Erro ao conectar com o servidor.", "danger");
+            alerta(containerModal, "Não foi possível conectar ao servidor.", "danger");
         }
     });
 });

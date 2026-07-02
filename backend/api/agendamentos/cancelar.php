@@ -10,7 +10,7 @@ $sql = "UPDATE agendamentos
         SET status = 'cancelado'
         WHERE id_agendamento = ?
           AND (id_cliente = ? OR id_prestador = ?)
-          AND status IN ('aguardando_orcamento', 'orcamento_enviado', 'confirmado')";
+          AND status IN ('aguardando_orcamento', 'orcamento_realizado', 'confirmado')";
 $stmt = $con->prepare($sql);
 $stmt->bind_param("iii", $id_agendamento, $id_usuario, $id_usuario);
 

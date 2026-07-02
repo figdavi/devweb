@@ -16,11 +16,13 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const locais = await respLocais.json();
     const selectLocal = document.getElementById("filtroLocal");
+    const locaisMap = {};
     if (Array.isArray(locais)) {
         locais.forEach(l => {
+            locaisMap[l.id_local] = l;
             const opt = document.createElement("option");
             opt.value = l.id_local;
-            opt.textContent = `${l.nome} – ${l.cidade}`;
+            opt.textContent = `${l.nome} – ${l.cidade}/${l.estado}`;
             selectLocal.appendChild(opt);
         });
     }
@@ -41,11 +43,16 @@ document.addEventListener("DOMContentLoaded", async function () {
         const id_categoria = document.getElementById("filtroCategoria").value;
         const preco_min    = document.getElementById("filtroPrecoMin").value;
         const preco_max    = document.getElementById("filtroPrecoMax").value;
+        const id_local     = document.getElementById("filtroLocal").value;
 
         const params = new URLSearchParams();
         if (id_categoria) params.append("id_categoria", id_categoria);
         if (preco_min)    params.append("preco_min", preco_min);
         if (preco_max)    params.append("preco_max", preco_max);
+        if (id_local && locaisMap[id_local]) {
+            params.append("cidade", locaisMap[id_local].cidade);
+            params.append("estado", locaisMap[id_local].estado);
+        }
 
         const lista = document.getElementById("listaPrestadores");
         lista.innerHTML = '<p class="text-secondary">Buscando...</p>';

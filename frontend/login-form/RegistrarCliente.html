@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="loginstyles.css">
 </head>
 
-<body class="d-flex align-items-center py-4 Bg-body-tertiary">
+<body class="d-flex align-items-center Bg-body-tertiary">
     <main class="w-100 m-auto form-container-registrar">
         <form id="formRegistrarCliente">
             <div id="containerAlerta"></div>
@@ -38,10 +38,46 @@
                 <label for="floating-input">Confirmar Senha</label>
             </div>
             <div class="form-floating">
-                <input type="text" class="form-control mb-3 reg-cep" id="floating-input" placeholder="CEP"
-                    inputmode="numeric" maxlength="8" pattern="\d{8}"
-                    oninput="this.value = this.value.replace(/\D/g, '')">
-                <label for="floating-input">Seu CEP (Apenas Números)</label>
+                <input type="text" class="form-control mb-3 reg-nome-local" id="regNomeLocal" placeholder="Nome do local">
+                <label for="regNomeLocal">Nome do local (ex: Casa, Trabalho)</label>
+            </div>
+            <div class="row g-2 mb-3">
+                <div class="col-8">
+                    <div class="form-floating">
+                        <input type="text" class="form-control reg-cep" id="regCep" placeholder="CEP"
+                            inputmode="numeric" maxlength="8" pattern="\d{8}"
+                            oninput="this.value = this.value.replace(/\D/g, '')">
+                        <label for="regCep">CEP (apenas números)</label>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-floating">
+                        <input type="text" class="form-control reg-numero" id="regNumero" placeholder="Número">
+                        <label for="regNumero">Número</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-floating mb-3" id="regEnderecoContainer" style="display:none">
+                <input type="text" class="form-control" id="regLogradouro" readonly placeholder="Logradouro">
+                <label for="regLogradouro">Logradouro</label>
+            </div>
+            <div class="row g-2 mb-3" id="regEnderecoCidadeContainer" style="display:none">
+                <div class="col-8">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="regCidade" readonly placeholder="Cidade">
+                        <label for="regCidade">Cidade</label>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="regEstado" readonly placeholder="UF">
+                        <label for="regEstado">UF</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control reg-complemento" id="regComplemento" placeholder="Complemento">
+                <label for="regComplemento">Complemento (opcional)</label>
             </div>
             <div class="form-floating">
                 <input type="tel" class="form-control mb-3 reg-telefone" id="floating-telefone"

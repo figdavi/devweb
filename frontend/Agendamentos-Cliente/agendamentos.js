@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const STATUS_LABEL = {
         aguardando_orcamento: "Aguardando Orçamento",
-        orcamento_enviado:    "Orçamento Enviado",
+        orcamento_realizado: "Orçamento Realizado",
         confirmado:           "Confirmado",
         em_andamento:         "Em Andamento",
         concluido:            "Concluído",
@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     };
     const STATUS_COR = {
         aguardando_orcamento: "secondary",
-        orcamento_enviado:    "info text-dark",
+        orcamento_realizado: "info text-dark",
         confirmado:           "success-subtle text-success-emphasis border border-success-subtle",
         em_andamento:         "warning text-dark",
         concluido:            "success",
@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         switch (status) {
             case "aguardando_orcamento":
                 return `<button class="btn btn-danger btn-sm w-100 btn-cancelar" data-id="${id_agendamento}">Cancelar</button>`;
-            case "orcamento_enviado":
+            case "orcamento_realizado":
                 return `<button class="btn btn-outline-primary btn-sm w-100 btn-orcamento"
                             data-id="${id_agendamento}" data-valor="${valor}" data-tipo="${tipo_cobranca}"
                             data-prestador="${nome_prestador}">Ver Orçamento</button>`;
