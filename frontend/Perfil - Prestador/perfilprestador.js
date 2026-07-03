@@ -30,6 +30,14 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const LABELS = { hora: "/h", diaria: "/dia", servico: "" };
 
+    // Comentários de avaliação são texto livre enviado pelo usuário — sempre
+    // escapar antes de inserir via innerHTML para evitar XSS armazenado.
+    function escapeHtml(texto) {
+        const div = document.createElement("div");
+        div.textContent = texto ?? "";
+        return div.innerHTML;
+    }
+
     // ── Carregar perfil ────────────────────────────────────────────────────
     let dados;
     try {
@@ -85,7 +93,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     <strong class="small">${a.nome_cliente}</strong>
                     <span class="text-warning small">${"★".repeat(Number(a.cliente_nota))}${"☆".repeat(5 - Number(a.cliente_nota))}</span>
                   </div>
-                  ${a.cliente_comentario ? `<p class="text-secondary small mb-0">"${a.cliente_comentario}"</p>` : ""}
+                  ${a.cliente_comentario ? `<p class="text-secondary small mb-0">"${escapeHtml(a.cliente_comentario)}"</p>` : ""}
                 </div>`).join("");
     }
 
@@ -141,6 +149,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     const DIAS_SEMANA_LABEL = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
     const janelaCache = {}; // cache de disponibilidade.php por data, evita refetch
 
+    const COR_INDISPONIVEL = 'color:#adb5bd;background-color:#f1f3f5;';   // fora do expediente / dia sem atendimento
+    const COR_FRAGMENTARIA = 'color:#842029;background-color:#f8d7da;';  // fragmentaria: pularia outro agendamento
+
+    // Meia em meia hora, das 00:00 às 23:30
+    const TODOS_HORARIOS = Array.from({ length: 48 }, (_, i) =>
+        `${String(Math.floor(i / 2)).padStart(2, "0")}:${i % 2 === 0 ? "00" : "30"}`);
+
     let diasDisponiveis = new Set();
     try {
         const respDias = await fetch(`../../backend/api/prestadores/dias_disponiveis.php?id_prestador=${id_prestador}`);
@@ -156,18 +171,27 @@ document.addEventListener("DOMContentLoaded", async function () {
         return `${DIAS_SEMANA_LABEL[d.getDay()]}, ${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}`;
     }
 
-    // Gera a lista dos próximos dias em que o prestador atende, a partir de `desde` (Date)
-    function gerarDiasDisponiveis(desde, quantidade = 60) {
+    // Gera os próximos `quantidade` dias corridos a partir de `desde`, marcando como
+    // desabilitados os dias em que o prestador não atende (permanecem visíveis e cinzas)
+    function gerarProximosDias(desde, quantidade = 60) {
         const dias = [];
         const cursor = new Date(desde);
         cursor.setHours(0, 0, 0, 0);
-        for (let i = 0; dias.length < 30 && i < quantidade; i++) {
-            if (diasDisponiveis.has(cursor.getDay())) {
-                dias.push({ iso: toISODate(cursor), label: formatarDiaLabel(cursor) });
-            }
+        for (let i = 0; i < quantidade; i++) {
+            dias.push({
+                iso: toISODate(cursor),
+                label: formatarDiaLabel(cursor),
+                desabilitado: !diasDisponiveis.has(cursor.getDay()),
+            });
             cursor.setDate(cursor.getDate() + 1);
         }
         return dias;
+    }
+
+    function renderizarOpcoesDias(select, dias, placeholder) {
+        select.innerHTML = `<option value="" disabled selected>${placeholder}</option>` +
+            dias.map(d => `<option value="${d.iso}"${d.desabilitado ? ` disabled style="${COR_INDISPONIVEL}"` : ""}>${d.label}</option>`).join("");
+        select.disabled = dias.every(d => d.desabilitado);
     }
 
     async function buscarJanela(iso) {
@@ -199,28 +223,46 @@ document.addEventListener("DOMContentLoaded", async function () {
         return corte;
     }
 
-    function gerarHorariosJanela(janela, apartirDe = null, ocupados = []) {
-        const horarios = [];
+    // Gera as 48 opções de horário do dia; horários fora do expediente ou já
+    // ocupados por outro agendamento aparecem desabilitados e acinzentados.
+    function renderizarOpcoesHoraInicio(select, janela, ocupados) {
+        let algumHabilitado = false;
+        select.innerHTML = '<option value="" disabled selected>Selecione um horário</option>' +
+            TODOS_HORARIOS.map(hora => {
+                const foraExpediente = hora < janela.inicio || hora >= janela.fim;
+                const ocupado = !foraExpediente && (ocupados || []).some(o => hora >= o.inicio && hora < o.fim);
+                const desabilitado = foraExpediente || ocupado;
+                if (!desabilitado) algumHabilitado = true;
+                return `<option value="${hora}"${desabilitado ? ` disabled style="${COR_INDISPONIVEL}"` : ""}>${hora}</option>`;
+            }).join("");
+        select.disabled = false;
+        return algumHabilitado;
+    }
+
+    // Mesma lógica, mas horários que fragmentariam um agendamento existente (i.e.
+    // pulariam por cima de outra reserva) recebem uma cor diferente da de "fora do
+    // expediente", já que o motivo de bloqueio é outro.
+    function renderizarOpcoesHoraFim(select, janela, apartirDe, ocupados) {
         const corte = calcularCorteOcupados(ocupados, apartirDe);
-        let [h, m] = janela.inicio.split(":").map(Number);
-        const [hFim, mFim] = janela.fim.split(":").map(Number);
-        while (h < hFim || (h === hFim && m <= mFim)) {
-            const horaStr = `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`;
-            const depoisDoInicio = !apartirDe || horaStr > apartirDe;
-            const antesDoCorte   = !corte || horaStr <= corte;
-            if (depoisDoInicio && antesDoCorte) horarios.push(horaStr);
-            m += 30;
-            if (m >= 60) { m -= 60; h += 1; }
-        }
-        return horarios;
+        let algumHabilitado = false;
+        select.innerHTML = '<option value="" disabled selected>Selecione um horário</option>' +
+            TODOS_HORARIOS.map(hora => {
+                const foraExpediente = hora < janela.inicio || hora > janela.fim;
+                const antesOuNoInicio = apartirDe && hora <= apartirDe;
+                const fragmentaria = !foraExpediente && !antesOuNoInicio && corte && hora > corte;
+                const desabilitado = foraExpediente || antesOuNoInicio || fragmentaria;
+                if (!desabilitado) algumHabilitado = true;
+                const estilo = fragmentaria ? COR_FRAGMENTARIA : (desabilitado ? COR_INDISPONIVEL : "");
+                return `<option value="${hora}"${desabilitado ? ` disabled` : ""}${estilo ? ` style="${estilo}"` : ""}>${hora}</option>`;
+            }).join("");
+        select.disabled = false;
+        return algumHabilitado;
     }
 
     // ── Dia de início ─────────────────────────────────────────────────────────
-    const diasInicio = gerarDiasDisponiveis(new Date());
-    selectDiaInicio.innerHTML = '<option value="" disabled selected>Selecione um dia</option>' +
-        diasInicio.map(d => `<option value="${d.iso}">${d.label}</option>`).join("");
-    selectDiaInicio.disabled = diasInicio.length === 0;
-    if (diasInicio.length === 0) {
+    const diasInicio = gerarProximosDias(new Date());
+    renderizarOpcoesDias(selectDiaInicio, diasInicio, "Selecione um dia");
+    if (selectDiaInicio.disabled) {
         avisoInicio.textContent = "O prestador não possui horários de atendimento cadastrados.";
         avisoInicio.style.display = "";
     }
@@ -236,16 +278,19 @@ document.addEventListener("DOMContentLoaded", async function () {
         const dadosDisp = await buscarJanela(iso);
         exibirOcupados(ocupadosInicioEl, dadosDisp.ocupados);
 
-        if (!dadosDisp.slots?.length) {
-            selectHoraInicio.innerHTML = '<option value="" selected>Nenhum horário disponível</option>';
-            avisoInicio.textContent = dadosDisp.mensagem ?? "Nenhum horário disponível neste dia.";
+        if (!dadosDisp.janela) {
+            selectHoraInicio.innerHTML = '<option value="" selected>Indisponível</option>';
+            selectHoraInicio.disabled = true;
+            avisoInicio.textContent = dadosDisp.mensagem ?? "Prestador não atende neste dia.";
             avisoInicio.style.display = "";
             return;
         }
 
-        selectHoraInicio.innerHTML = '<option value="" disabled selected>Selecione um horário</option>' +
-            dadosDisp.slots.map(s => `<option value="${s.inicio}">${s.inicio}</option>`).join("");
-        selectHoraInicio.disabled = false;
+        const algumHabilitado = renderizarOpcoesHoraInicio(selectHoraInicio, dadosDisp.janela, dadosDisp.ocupados);
+        if (!algumHabilitado) {
+            avisoInicio.textContent = "Todos os horários deste dia já estão ocupados.";
+            avisoInicio.style.display = "";
+        }
     });
 
     selectHoraInicio.addEventListener("change", function () {
@@ -265,10 +310,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     function popularDiaFim() {
         const diaInicioIso = selectDiaInicio.value;
-        const diasFim = gerarDiasDisponiveis(new Date(diaInicioIso + "T00:00:00"));
-        selectDiaFim.innerHTML = '<option value="" disabled selected>Selecione um dia</option>' +
-            diasFim.map(d => `<option value="${d.iso}">${d.label}</option>`).join("");
-        selectDiaFim.disabled = false;
+        const diasFim = gerarProximosDias(new Date(diaInicioIso + "T00:00:00"));
+        renderizarOpcoesDias(selectDiaFim, diasFim, "Selecione um dia");
         selectHoraFim.innerHTML = '<option value="" selected>Horário</option>';
         selectHoraFim.disabled = true;
         avisoFim.style.display = "none";
@@ -293,18 +336,13 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
 
         const mesmoDia = iso === selectDiaInicio.value;
-        const horarios = gerarHorariosJanela(dadosDisp.janela, mesmoDia ? selectHoraInicio.value : null, dadosDisp.ocupados);
+        const algumHabilitado = renderizarOpcoesHoraFim(
+            selectHoraFim, dadosDisp.janela, mesmoDia ? selectHoraInicio.value : null, dadosDisp.ocupados);
 
-        if (!horarios.length) {
-            selectHoraFim.innerHTML = '<option value="" selected>Nenhum horário disponível</option>';
+        if (!algumHabilitado) {
             avisoFim.textContent = "Nenhum horário de término disponível neste dia.";
             avisoFim.style.display = "";
-            return;
         }
-
-        selectHoraFim.innerHTML = '<option value="" disabled selected>Selecione um horário</option>' +
-            horarios.map(h => `<option value="${h}">${h}</option>`).join("");
-        selectHoraFim.disabled = false;
     });
 
     resetarTermino();

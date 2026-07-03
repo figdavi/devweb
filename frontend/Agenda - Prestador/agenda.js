@@ -8,6 +8,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
     }
 
+    // Comentários de avaliação são texto livre enviado pelo usuário — sempre
+    // escapar antes de inserir via innerHTML para evitar XSS armazenado.
+    function escapeHtml(texto) {
+        const div = document.createElement("div");
+        div.textContent = texto ?? "";
+        return div.innerHTML;
+    }
+
     const containerAlerta    = document.getElementById("containerAlerta");
     const containerAlertaDisp = document.getElementById("containerAlertaDisp");
 
@@ -33,6 +41,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         return new Date(dt).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
     }
 
+    function formatarEstrelas(nota) {
+        return "★".repeat(Number(nota)) + "☆".repeat(5 - Number(nota));
+    }
+
+    let agendamentosMap = {}; // id_agendamento -> objeto completo, evita reencodar texto livre em atributos HTML
+
     // ── Carregar agendamentos ──────────────────────────────────────────────
     async function carregar() {
         const status = document.getElementById("filtroStatus").value;
@@ -51,6 +65,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                 return;
             }
 
+            agendamentosMap = Object.fromEntries(dados.map(ag => [ag.id_agendamento, ag]));
+
             lista.innerHTML = dados.map(ag => {
                 const acoes = botoesPrestador(ag);
                 return `
@@ -65,7 +81,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                         <h6 class="card-subtitle mb-2 text-body-secondary">${ag.servico}</h6>
                         <p class="card-text small text-secondary mb-1">Local: ${ag.local_nome}</p>
                         ${ag.data_hora_inicio ? `<p class="card-text small text-secondary mb-1">Início: ${formatarData(ag.data_hora_inicio)}</p>` : ""}
-                        ${ag.valor ? `<p class="card-text small fw-bold mb-0">Valor: R$ ${parseFloat(ag.valor).toFixed(2).replace(".", ",")}</p>` : ""}
+                        ${ag.data_hora_fim ? `<p class="card-text small text-secondary mb-1">Término: ${formatarData(ag.data_hora_fim)}</p>` : ""}
+                        ${parseFloat(ag.valor) > 0 ? `<p class="card-text small fw-bold mb-0">Valor: R$ ${parseFloat(ag.valor).toFixed(2).replace(".", ",")}</p>` : ""}
                       </div>
                       <div class="d-flex flex-wrap gap-2 mt-3">${acoes}</div>
                     </div>
@@ -81,6 +98,10 @@ document.addEventListener("DOMContentLoaded", async function () {
                 btn.addEventListener("click", () => acao("concluir", btn.dataset.id)));
             lista.querySelectorAll(".btn-cancelar").forEach(btn =>
                 btn.addEventListener("click", () => acao("cancelar", btn.dataset.id)));
+            lista.querySelectorAll(".btn-avaliar").forEach(btn =>
+                btn.addEventListener("click", () => abrirAvaliar(btn.dataset.id)));
+            lista.querySelectorAll(".btn-ver-avaliacao").forEach(btn =>
+                btn.addEventListener("click", () => abrirVerAvaliacao(agendamentosMap[btn.dataset.id], btn.dataset.quem)));
         } catch {
             alerta(containerAlerta, "Erro ao carregar agendamentos.", "danger");
         }
@@ -91,14 +112,25 @@ document.addEventListener("DOMContentLoaded", async function () {
         switch (ag.status) {
             case "aguardando_orcamento":
                 return `<button class="btn btn-primary btn-sm w-100 btn-orcamento" data-id="${id}">Enviar Orçamento</button>
-                        <button class="btn btn-danger btn-sm btn-cancelar" data-id="${id}">Cancelar</button>`;
+                        <button class="btn btn-danger btn-sm w-100 btn-cancelar" data-id="${id}">Cancelar</button>`;
             case "orcamento_realizado":
                 return `<button class="btn btn-danger btn-sm w-100 btn-cancelar" data-id="${id}">Cancelar</button>`;
             case "confirmado":
                 return `<button class="btn btn-success btn-sm w-100 btn-iniciar" data-id="${id}">Iniciar Serviço</button>
-                        <button class="btn btn-danger btn-sm btn-cancelar" data-id="${id}">Cancelar</button>`;
+                        <button class="btn btn-danger btn-sm w-100 btn-cancelar" data-id="${id}">Cancelar</button>`;
             case "em_andamento":
                 return `<button class="btn btn-primary btn-sm w-100 btn-concluir" data-id="${id}">Concluir Serviço</button>`;
+            case "concluido": {
+                // "Minha avaliação" = a que EU (prestador) dei ao cliente.
+                // "Avaliação do cliente" = a que o CLIENTE me deu. São independentes.
+                const minha = ag.prestador_nota
+                    ? `<button class="btn btn-outline-secondary btn-sm w-100 btn-ver-avaliacao" data-id="${id}" data-quem="prestador">Ver minha avaliação</button>`
+                    : `<button class="btn btn-outline-warning btn-sm w-100 btn-avaliar" data-id="${id}">Avaliar Cliente</button>`;
+                const doCliente = ag.cliente_nota
+                    ? `<button class="btn btn-outline-secondary btn-sm w-100 btn-ver-avaliacao" data-id="${id}" data-quem="cliente">Ver avaliação do cliente</button>`
+                    : "";
+                return minha + doCliente;
+            }
             default:
                 return "";
         }
@@ -148,6 +180,67 @@ document.addEventListener("DOMContentLoaded", async function () {
             else alerta(containerAlertaModal, dados.erro, "danger");
         } catch { alerta(containerAlertaModal, "Erro ao conectar com o servidor.", "danger"); }
     });
+
+    // ── Modal Avaliar Cliente ──────────────────────────────────────────────
+    const modalAvaliar = new bootstrap.Modal(document.getElementById("modalAvaliar"));
+
+    function abrirAvaliar(id_agendamento) {
+        document.getElementById("avaliarIdAgendamento").value = id_agendamento;
+        document.getElementById("avaliarNota").value = "";
+        document.getElementById("avaliarComentario").value = "";
+        document.getElementById("containerAlertaAvaliar").innerHTML = "";
+        document.querySelectorAll("#modalAvaliar .estrela").forEach(b => b.classList.remove("active", "btn-warning"));
+        modalAvaliar.show();
+    }
+
+    document.querySelectorAll("#modalAvaliar .estrela").forEach(btn => {
+        btn.addEventListener("click", function () {
+            const nota = this.dataset.nota;
+            document.getElementById("avaliarNota").value = nota;
+            document.querySelectorAll("#modalAvaliar .estrela").forEach(b => {
+                b.classList.toggle("btn-warning", parseInt(b.dataset.nota) <= parseInt(nota));
+                b.classList.toggle("btn-outline-warning", parseInt(b.dataset.nota) > parseInt(nota));
+            });
+        });
+    });
+
+    document.getElementById("btnEnviarAvaliacao").addEventListener("click", async function () {
+        const id_agendamento = document.getElementById("avaliarIdAgendamento").value;
+        const nota           = document.getElementById("avaliarNota").value;
+        const comentario     = document.getElementById("avaliarComentario").value.trim();
+        const containerAlertaAvaliar = document.getElementById("containerAlertaAvaliar");
+
+        if (!nota) {
+            alerta(containerAlertaAvaliar, "Selecione uma nota.", "warning");
+            return;
+        }
+
+        const fd = new FormData();
+        fd.append("id_agendamento", id_agendamento);
+        fd.append("id_usuario",     id_usuario);
+        fd.append("nota",           nota);
+        fd.append("comentario",     comentario);
+
+        try {
+            const dados = await (await fetch("../../backend/api/agendamentos/avaliacoes/create.php", { method: "POST", body: fd })).json();
+            if (dados.sucesso) { modalAvaliar.hide(); carregar(); }
+            else alerta(containerAlertaAvaliar, dados.erro, "danger");
+        } catch { alerta(containerAlertaAvaliar, "Erro ao conectar com o servidor.", "danger"); }
+    });
+
+    // ── Modal Ver Avaliação (somente leitura) ───────────────────────────────
+    const modalVerAvaliacao = new bootstrap.Modal(document.getElementById("modalVerAvaliacao"));
+
+    function abrirVerAvaliacao(ag, quem) {
+        const nota       = quem === "cliente" ? ag.cliente_nota       : ag.prestador_nota;
+        const comentario = quem === "cliente" ? ag.cliente_comentario : ag.prestador_comentario;
+        document.getElementById("modalVerAvaliacaoTitulo").textContent =
+            quem === "cliente" ? "Avaliação do cliente" : "Sua avaliação";
+        document.getElementById("modalVerAvaliacaoBody").innerHTML = `
+            <p class="text-warning fs-5 mb-2">${formatarEstrelas(nota)}</p>
+            ${comentario ? `<p class="mb-0">"${escapeHtml(comentario)}"</p>` : '<p class="text-secondary mb-0">Sem comentário.</p>'}`;
+        modalVerAvaliacao.show();
+    }
 
     document.getElementById("filtroStatus").addEventListener("change", carregar);
 

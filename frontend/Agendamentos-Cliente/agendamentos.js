@@ -31,10 +31,24 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     function formatarValor(valor, tipo) {
-        if (!valor) return "";
+        if (!(parseFloat(valor) > 0)) return "";
         const labels = { hora: "/h", diaria: "/dia", servico: "" };
         return `R$ ${parseFloat(valor).toFixed(2).replace(".", ",")}${labels[tipo] ?? ""}`;
     }
+
+    function formatarEstrelas(nota) {
+        return "★".repeat(Number(nota)) + "☆".repeat(5 - Number(nota));
+    }
+
+    // Comentários de avaliação são texto livre enviado pelo usuário — sempre
+    // escapar antes de inserir via innerHTML para evitar XSS armazenado.
+    function escapeHtml(texto) {
+        const div = document.createElement("div");
+        div.textContent = texto ?? "";
+        return div.innerHTML;
+    }
+
+    let agendamentosMap = {}; // id_agendamento -> objeto completo, evita reencodar texto livre em atributos HTML
 
     // ── Carregar agendamentos ──────────────────────────────────────────────
     async function carregar() {
@@ -54,6 +68,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                 return;
             }
 
+            agendamentosMap = Object.fromEntries(dados.map(ag => [ag.id_agendamento, ag]));
+
             lista.innerHTML = dados.map(ag => {
                 const acoes = botoesCliente(ag);
                 return `
@@ -68,7 +84,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                         <h6 class="card-subtitle mb-2 text-body-secondary">${ag.servico}</h6>
                         <p class="card-text small text-secondary mb-1">Local: ${ag.local_nome}</p>
                         ${ag.data_hora_inicio ? `<p class="card-text small text-secondary mb-1">Início: ${formatarData(ag.data_hora_inicio)}</p>` : ""}
-                        ${ag.valor ? `<p class="card-text small fw-bold mb-0">Valor: ${formatarValor(ag.valor, ag.tipo_cobranca)}</p>` : ""}
+                        ${ag.data_hora_fim ? `<p class="card-text small text-secondary mb-1">Término: ${formatarData(ag.data_hora_fim)}</p>` : ""}
+                        ${parseFloat(ag.valor) > 0 ? `<p class="card-text small fw-bold mb-0">Valor: ${formatarValor(ag.valor, ag.tipo_cobranca)}</p>` : ""}
                       </div>
                       <div class="d-flex flex-wrap gap-2 mt-3">${acoes}</div>
                     </div>
@@ -88,6 +105,10 @@ document.addEventListener("DOMContentLoaded", async function () {
             // Botões avaliar
             lista.querySelectorAll(".btn-avaliar").forEach(btn =>
                 btn.addEventListener("click", () => abrirAvaliar(btn.dataset.id)));
+
+            // Botões ver avaliação
+            lista.querySelectorAll(".btn-ver-avaliacao").forEach(btn =>
+                btn.addEventListener("click", () => abrirVerAvaliacao(agendamentosMap[btn.dataset.id], btn.dataset.quem)));
         } catch {
             alerta("Erro ao carregar agendamentos.", "danger");
         }
@@ -104,8 +125,17 @@ document.addEventListener("DOMContentLoaded", async function () {
                             data-prestador="${nome_prestador}">Ver Orçamento</button>`;
             case "confirmado":
                 return `<button class="btn btn-danger btn-sm w-100 btn-cancelar" data-id="${id_agendamento}">Cancelar</button>`;
-            case "concluido":
-                return `<button class="btn btn-outline-warning btn-sm w-100 btn-avaliar" data-id="${id_agendamento}">Avaliar Serviço</button>`;
+            case "concluido": {
+                // "Minha avaliação" = a que EU (cliente) dei ao prestador.
+                // "Avaliação do prestador" = a que o PRESTADOR me deu. São independentes.
+                const minha = ag.cliente_nota
+                    ? `<button class="btn btn-outline-secondary btn-sm w-100 btn-ver-avaliacao" data-id="${id_agendamento}" data-quem="cliente">Ver minha avaliação</button>`
+                    : `<button class="btn btn-outline-warning btn-sm w-100 btn-avaliar" data-id="${id_agendamento}">Avaliar Serviço</button>`;
+                const doPrestador = ag.prestador_nota
+                    ? `<button class="btn btn-outline-secondary btn-sm w-100 btn-ver-avaliacao" data-id="${id_agendamento}" data-quem="prestador">Ver avaliação do prestador</button>`
+                    : "";
+                return minha + doPrestador;
+            }
             default:
                 return "";
         }
@@ -207,6 +237,20 @@ document.addEventListener("DOMContentLoaded", async function () {
             else containerAlertaAvaliar.innerHTML = `<div class="alert alert-danger">${dados.erro}</div>`;
         } catch { containerAlertaAvaliar.innerHTML = `<div class="alert alert-danger">Erro ao conectar com o servidor.</div>`; }
     });
+
+    // ── Modal Ver Avaliação (somente leitura) ───────────────────────────────
+    const modalVerAvaliacao = new bootstrap.Modal(document.getElementById("modalVerAvaliacao"));
+
+    function abrirVerAvaliacao(ag, quem) {
+        const nota       = quem === "prestador" ? ag.prestador_nota       : ag.cliente_nota;
+        const comentario = quem === "prestador" ? ag.prestador_comentario : ag.cliente_comentario;
+        document.getElementById("modalVerAvaliacaoTitulo").textContent =
+            quem === "prestador" ? "Avaliação do prestador" : "Sua avaliação";
+        document.getElementById("modalVerAvaliacaoBody").innerHTML = `
+            <p class="text-warning fs-5 mb-2">${formatarEstrelas(nota)}</p>
+            ${comentario ? `<p class="mb-0">"${escapeHtml(comentario)}"</p>` : '<p class="text-secondary mb-0">Sem comentário.</p>'}`;
+        modalVerAvaliacao.show();
+    }
 
     document.getElementById("filtroStatus").addEventListener("change", carregar);
     carregar();

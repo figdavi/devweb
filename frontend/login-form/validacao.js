@@ -109,10 +109,9 @@ document.addEventListener("DOMContentLoaded", function () {
             const complemento    = formRegistrarCliente.querySelector(".reg-complemento")?.value.trim() ?? "";
             const nome_local     = formRegistrarCliente.querySelector(".reg-nome-local")?.value.trim() || "Casa";
             const telefone       = formRegistrarCliente.querySelector(".reg-telefone")?.value.trim() ?? "";
-            const termosCheck    = document.getElementById("flexCheckDefault")?.checked ?? false;
 
-            if (!nome || !email || !senha || !confirmarSenha || !cep || !numero || !termosCheck) {
-                mostrarAlerta("Preencha todos os campos obrigatórios e aceite os termos.", "warning");
+            if (!nome || !email || !senha || !confirmarSenha || !cep || !numero) {
+                mostrarAlerta("Preencha todos os campos obrigatórios.", "warning");
                 return;
             }
 
@@ -185,10 +184,9 @@ document.addEventListener("DOMContentLoaded", function () {
             const cep            = formRegistrarPrestador.querySelector(".reg-cep").value.trim();
             const id_categoria   = formRegistrarPrestador.querySelector(".reg-opcao").value;
             const descricao      = formRegistrarPrestador.querySelector(".reg-descricao").value.trim();
-            const termosCheck    = document.getElementById("flexCheckDefault")?.checked ?? false;
 
-            if (!nome || !email || !telefone || !senha || !confirmarSenha || !cep || !id_categoria || !descricao || !termosCheck) {
-                mostrarAlerta("Preencha todos os campos e aceite os termos.", "warning");
+            if (!nome || !email || !telefone || !senha || !confirmarSenha || !cep || !id_categoria || !descricao) {
+                mostrarAlerta("Preencha todos os campos.", "warning");
                 return;
             }
 

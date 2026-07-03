@@ -2,14 +2,9 @@
 -- SEED DE DADOS PARA TESTE — servixus
 -- =============================================================================
 --
--- ANTES DE EXECUTAR:
---   1. Gere o hash de 'senha123' com PHP:
---        php -r "echo password_hash('senha123', PASSWORD_BCRYPT);"
---   2. Substitua TODAS as ocorrências de 'HASH_SENHA123' abaixo pelo hash gerado
---   3. Execute:
---        mysql -u root -p servixus < backend/database/seed.sql
---
---   Obs.: sem a substituição, todos os endpoints funcionam EXCETO auth/login.php.
+-- A senha de todos os usuários de teste abaixo é 'senha123' (hash bcrypt já
+-- embutido nos INSERTs). Para gerar um novo hash, caso necessário:
+--   php -r "echo password_hash('senha123', PASSWORD_BCRYPT);"
 --
 -- =============================================================================
 -- USUÁRIOS DE TESTE
@@ -68,14 +63,13 @@ INSERT INTO categorias (id_categoria, nome) VALUES
 (3, 'Limpeza');
 
 -- -----------------------------------------------------------------------------
--- Usuários
--- (substitua HASH_SENHA123 pelo resultado de: php -r "echo password_hash('senha123', PASSWORD_BCRYPT);")
+-- Usuários (senha para todos: senha123)
 -- -----------------------------------------------------------------------------
 INSERT INTO usuarios (id_usuario, email, senha, nome, telefone) VALUES
-(1, 'joao@email.com',   'HASH_SENHA123', 'João Silva',         '(21) 91111-1111'),
-(2, 'maria@email.com',  'HASH_SENHA123', 'Maria Souza',        '(22) 92222-2222'),
-(3, 'carlos@email.com', 'HASH_SENHA123', 'Carlos Eletricista', '(22) 93333-3333'),
-(4, 'ana@email.com',    'HASH_SENHA123', 'Ana Encanadora',     '(22) 94444-4444');
+(1, 'joao@email.com',   '$2y$10$GYb.Vyx9Vizxzjepyiy3T.P0j3KM.oYpANK/Nun9rYOFPtPiI6iom', 'João Silva',         '(21) 91111-1111'),
+(2, 'maria@email.com',  '$2y$10$GYb.Vyx9Vizxzjepyiy3T.P0j3KM.oYpANK/Nun9rYOFPtPiI6iom', 'Maria Souza',        '(22) 92222-2222'),
+(3, 'carlos@email.com', '$2y$10$GYb.Vyx9Vizxzjepyiy3T.P0j3KM.oYpANK/Nun9rYOFPtPiI6iom', 'Carlos Eletricista', '(22) 93333-3333'),
+(4, 'ana@email.com',    '$2y$10$GYb.Vyx9Vizxzjepyiy3T.P0j3KM.oYpANK/Nun9rYOFPtPiI6iom', 'Ana Encanadora',     '(22) 94444-4444');
 
 -- -----------------------------------------------------------------------------
 -- Clientes (João e Maria)

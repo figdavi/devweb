@@ -90,6 +90,57 @@
       </div>
     </div>
 
+    <!-- Modal: Avaliar Cliente -->
+    <div class="modal fade" id="modalAvaliar" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Avaliar Cliente</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div id="containerAlertaAvaliar"></div>
+            <input type="hidden" id="avaliarIdAgendamento">
+            <div class="mb-3">
+              <label class="form-label">Nota (1 a 5)</label>
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-warning estrela" data-nota="1">★ 1</button>
+                <button type="button" class="btn btn-outline-warning estrela" data-nota="2">★ 2</button>
+                <button type="button" class="btn btn-outline-warning estrela" data-nota="3">★ 3</button>
+                <button type="button" class="btn btn-outline-warning estrela" data-nota="4">★ 4</button>
+                <button type="button" class="btn btn-outline-warning estrela" data-nota="5">★ 5</button>
+              </div>
+              <input type="hidden" id="avaliarNota" value="">
+            </div>
+            <div class="form-floating">
+              <textarea class="form-control" id="avaliarComentario" placeholder="Comentário" style="height:90px"></textarea>
+              <label>Comentário (opcional)</label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-primary" id="btnEnviarAvaliacao">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Ver Avaliação (somente leitura) -->
+    <div class="modal fade" id="modalVerAvaliacao" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalVerAvaliacaoTitulo">Avaliação</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body" id="modalVerAvaliacaoBody"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <script src="../sessao.js"></script>
     <script src="agenda.js"></script>

@@ -26,7 +26,7 @@ $resD->free();
 $stmtD->close();
 
 if (!$disp) {
-    ob_clean(); echo json_encode(["slots" => [], "mensagem" => "Prestador não atende neste dia."]);
+    ob_clean(); echo json_encode(["mensagem" => "Prestador não atende neste dia."]);
     $con->close();
     exit;
 }
@@ -54,37 +54,6 @@ $resAg->free();
 $stmtAg->close();
 $con->close();
 
-// Gera slots de 1h dentro da janela de disponibilidade
-$slots       = [];
-$slot_dur    = 3600; // 1 hora
-$janela_ini  = strtotime($data . ' ' . $disp['hora_inicio']);
-$janela_fim  = strtotime($data . ' ' . $disp['hora_fim']);
-$current     = $janela_ini;
-
-while ($current + $slot_dur <= $janela_fim) {
-    $slot_fim = $current + $slot_dur;
-
-    // Verifica sobreposição com bookings existentes
-    $ocupado = false;
-    foreach ($bookings as $ag) {
-        // Ignora bookings de duração zero (placeholder antigo)
-        if ($ag['inicio'] === $ag['fim']) continue;
-        if ($current < $ag['fim'] && $slot_fim > $ag['inicio']) {
-            $ocupado = true;
-            break;
-        }
-    }
-
-    if (!$ocupado) {
-        $slots[] = [
-            "inicio" => date('H:i', $current),
-            "fim"    => date('H:i', $slot_fim),
-        ];
-    }
-
-    $current += $slot_dur;
-}
-
 // Ocupados: intervalos já reservados neste dia, recortados para os limites do dia
 // (informativo para o cliente saber quais horários evitar ao montar o agendamento)
 $dia_ini_ts = strtotime($inicio_dia);
@@ -100,7 +69,6 @@ foreach ($bookings as $ag) {
 usort($ocupados, fn($a, $b) => strcmp($a['inicio'], $b['inicio']));
 
 ob_clean(); echo json_encode([
-    "slots"    => $slots,
     "janela"   => ["inicio" => substr($disp['hora_inicio'], 0, 5), "fim" => substr($disp['hora_fim'], 0, 5)],
     "ocupados" => $ocupados,
 ]);

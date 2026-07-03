@@ -1,99 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Servixus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="Busca-Servicos/styles.css">
+    <link rel="stylesheet" href="style.css?v=2">
     <script defer src="script.js"></script>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
-    
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
     <header>
-    <div class="header-esquerda">
-        <div class="logonome">
-            <img class="logo" src="imagens/85b278c4-b9b3-4686-8e9d-728843eb81f9.png" alt="Servixus Logo">
-            <h1 class="nome">Servixus</h1>
+        <div class="header-esquerda">
+            <div class="logonome">
+                <img class="logo" src="imagens/85b278c4-b9b3-4686-8e9d-728843eb81f9.png" alt="Servixus Logo">
+                <h1 class="nome m-0">Servixus</h1>
+            </div>
         </div>
-        
-        <nav class="menu-navegacao">
-            <a href="#home" class="info">Home</a>
-            <a href="#sobre" class="info">Sobre</a>
-        </nav>
-    </div>
-
-    <div class="header-botoes">
-        <button onclick="window.location.href='pergunta-registro/pergunta.html' "class="Registrar">Registrar-se</button>
-        <button onclick="window.location.href='login-form/login.html' " class="Entrar">Entrar</button>
-    </div>
     </header>
-    <section class="sobre">
-        <div class="texto1">
-            <h1>Bem vindo a Servixus</h1>
-            <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                Possimus aut neque perferendis quibusdam labore eum dolores dignissimos
-                illo distinctio corporis fugit tempora odit id odio ex nisi facilis,
-                ad quos?</p>
-                <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                Possimus aut neque perferendis quibusdam labore eum dolores dignissimos
-                illo distinctio corporis fugit tempora odit id odio ex nisi facilis,
-                ad quos?</p>
-                <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                Possimus aut neque perferendis quibusdam labore eum dolores dignissimos
-                illo distinctio corporis fugit tempora odit id odio ex nisi facilis,
-                ad quos?</p>
+
+    <main class="flex-grow-1">
+        <section class="container py-5">
+            <div class="row align-items-center g-5">
+                <div class="col-12 col-lg-6">
+                    <h1 class="display-5 fw-bold mb-3">Encontre o profissional certo, sem complicação</h1>
+                    <p class="lead text-secondary mb-4">
+                        Da instalação elétrica à limpeza da casa, conecte-se com prestadores de serviço
+                        avaliados pela comunidade e agende tudo em poucos cliques.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <button onclick="window.location.href='login-form/login.html'" class="btn btn-primary btn-lg">Entrar</button>
+                        <button onclick="window.location.href='pergunta-registro/pergunta.html'" class="btn btn-outline-secondary btn-lg">Registrar-se</button>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6">
+                    <img src="imagens/building-plans-design_1048-1852.avif" class="img-fluid rounded hero-img" alt="Ilustração de planejamento de serviços">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="mt-auto">
+        <div class="container py-5 text-center">
+            <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
+                <img class="logo" src="imagens/85b278c4-b9b3-4686-8e9d-728843eb81f9.png" height="36" alt="Servixus">
+                <span class="footer-nome fs-5">Servixus</span>
+            </div>
+            <p class="footer-tagline small mb-4">Conectando você aos melhores profissionais da sua região.</p>
+            <hr class="footer-divider">
+            <p class="mb-0 small footer-copy pt-4">© 2026 Servixus. Todos os direitos reservados.</p>
         </div>
-        <img src="imagens/building-plans-design_1048-1852.avif" alt="">
-    </section>
+    </footer>
 
-    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
-<footer>
-  <div class="footer-container">
-
-    <div class="footer-marca">
-      <img class="logo" src="imagens/85b278c4-b9b3-4686-8e9d-728843eb81f9.png" alt="Servixus">
-      <h3>Servixus</h3>
-      <p>Conectando você aos melhores profissionais da sua região.</p>
-    </div>
-
-    <div class="footer-links">
-      <h4>Serviços</h4>
-      <ul>
-        <li><a href="#">Pedreiro</a></li>
-        <li><a href="#">Eletricista</a></li>
-        <li><a href="#">Pintor</a></li>
-        <li><a href="#">Limpeza</a></li>
-        <li><a href="#">Marceneiro</a></li>
-      </ul>
-    </div>
-
-    <div class="footer-links">
-      <h4>Empresa</h4>
-      <ul>
-        <li><a href="#">Sobre nós</a></li>
-        <li><a href="#">Como funciona</a></li>
-        <li><a href="#">Seja um profissional</a></li>
-        <li><a href="#">Contato</a></li>
-      </ul>
-    </div>
-
-    <div class="footer-links">
-      <h4>Suporte</h4>
-      <ul>
-        <li><a href="#">Central de ajuda</a></li>
-        <li><a href="#">Termos de uso</a></li>
-        <li><a href="#">Privacidade</a></li>
-      </ul>
-    </div>
-
-  </div>
-
-  <div class="footer-bottom">
-    <p>© 2026 Servixus. Todos os direitos reservados.</p>
-  </div>
-</footer>
 </html>

@@ -13,12 +13,15 @@ $sql = "SELECT ag.id_agendamento, ag.status, ag.data_hora_inicio, ag.data_hora_f
                s.titulo AS servico,
                l.nome AS local_nome,
                uc.nome AS nome_cliente,
-               up.nome AS nome_prestador
+               up.nome AS nome_prestador,
+               av.cliente_nota, av.cliente_comentario,
+               av.prestador_nota, av.prestador_comentario
         FROM agendamentos ag
         JOIN servicos s ON s.id_servico = ag.id_servico
         JOIN locais l ON l.id_local = ag.id_local
         JOIN usuarios uc ON uc.id_usuario = ag.id_cliente
         JOIN usuarios up ON up.id_usuario = ag.id_prestador
+        LEFT JOIN avaliacoes av ON av.id_agendamento = ag.id_agendamento
         WHERE ag.$coluna = ?";
 
 $tipos  = "i";
